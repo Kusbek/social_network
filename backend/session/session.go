@@ -1,0 +1,77 @@
+package session
+
+import (
+	"errors"
+	"sync"
+	"time"
+
+	"github.com/lithammer/shortuuid"
+
+	"git.01.alem.school/Kusbek/social-network/backend/entity"
+)
+
+//Session ...
+type Session interface {
+	Insert(*entity.User) string
+	GetUser(string) (*entity.User, error)
+	Delete(string)
+}
+
+type session struct {
+	user       *entity.User
+	expireTime time.Time
+}
+
+type cookie struct {
+	expiration time.Duration
+	sessions   map[string]*session
+	mu         *sync.Mutex
+}
+
+//New ...
+func New() Session {
+	c := &cookie{
+		expiration: 10,
+		sessions:   make(map[string]*session),
+		mu:         &sync.Mutex{},
+	}
+	go c.monitor()
+	return c
+}
+
+func (c *cookie) Insert(u *entity.User) string {
+	uuid := shortuuid.New()
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.sessions[uuid] = &session{user: u, expireTime: time.Now().Add(c.expiration * time.Hour)}
+	return uuid
+}
+
+func (c *cookie) GetUser(uuid string) (*entity.User, error) {
+	session, ok := c.sessions[uuid]
+	if !ok {
+		return nil, errors.New("Unauthorized")
+	}
+	return session.user, nil
+}
+
+func (c *cookie) Delete(uuid string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	delete(c.sessions, uuid)
+}
+
+func (c *cookie) monitor() {
+	for {
+		// fmt.Println("cookie monitoring!!!")
+		time.Sleep(10 * time.Second)
+		for key, value := range c.sessions {
+
+			if value.expireTime.Before(time.Now()) {
+				c.mu.Lock()
+				delete(c.sessions, key)
+				c.mu.Unlock()
+			}
+		}
+	}
+}

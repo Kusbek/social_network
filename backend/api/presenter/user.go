@@ -2,6 +2,7 @@ package presenter
 
 import "git.01.alem.school/Kusbek/social-network/backend/entity"
 
+//User ...
 type User struct {
 	ID          entity.ID `json:"id,omitempty"`
 	Username    string    `json:"username,omitempty"`

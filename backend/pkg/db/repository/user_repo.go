@@ -6,16 +6,19 @@ import (
 	"git.01.alem.school/Kusbek/social-network/backend/entity"
 )
 
+//UserRepository ...
 type UserRepository struct {
 	db *sql.DB
 }
 
+//NewUserRepository ...
 func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{
 		db: db,
 	}
 }
 
+//Create ...
 func (r *UserRepository) Create(user *entity.User) (entity.ID, error) {
 	res, err := r.db.Exec(
 		`
@@ -32,6 +35,7 @@ func (r *UserRepository) Create(user *entity.User) (entity.ID, error) {
 	return int(id), nil
 }
 
+//Find ...
 func (r *UserRepository) Find(nickmail string) (*entity.User, error) {
 	user := &entity.User{}
 	err := r.db.QueryRow(`SELECT id, username, password FROM users WHERE username=$1 or email=$1`, nickmail).Scan(

@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+//User ...
 type User struct {
 	ID          int
 	Username    string
@@ -20,6 +21,7 @@ type User struct {
 	Password    string `validate:"min=5"`
 }
 
+//NewUser ...
 func NewUser(username, email, firstName, lastName, aboutMe, pathToPhoto, birthDate, password string) (*User, error) {
 	user := &User{
 		Username:    username,
@@ -39,11 +41,13 @@ func NewUser(username, email, firstName, lastName, aboutMe, pathToPhoto, birthDa
 	return user, nil
 }
 
+//Validate ...
 func (u *User) Validate() error {
 	var validate *validator.Validate = validator.New()
 	return validate.Struct(u)
 }
 
+//EncryptPassword ...
 func (u *User) EncryptPassword() {
 	u.Password, _ = encrypt(u.Password)
 }

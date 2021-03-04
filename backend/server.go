@@ -1,17 +1,19 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/gin-gonic/gin"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+
 	"git.01.alem.school/Kusbek/social-network/backend/api/handler"
 	"git.01.alem.school/Kusbek/social-network/backend/pkg/db/repository"
 	"git.01.alem.school/Kusbek/social-network/backend/pkg/db/sqlite"
 	"git.01.alem.school/Kusbek/social-network/backend/usecase/user"
-	"github.com/gin-gonic/gin"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 func main() {
@@ -34,18 +36,24 @@ func main() {
 
 	userRepo := repository.NewUserRepository(db)
 	userService := user.NewService(userRepo)
-	// _, err = userService.CreateUser("kusbek",
-	// 	"kusbek1994@gmail.com",
-	// 	"Bekarys",
-	// 	"Kuspan",
-	// 	"Something is important, but not this project",
-	// 	"./images/avatars/somephoto.jpg",
-	// 	"1994-09-18",
-	// 	"123456")
-
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	_, err = userService.FindUser(
+		"kusbek",
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			userService.CreateUser(
+				"kusbek",
+				"kusbek1994@gmail.com",
+				"Bekarys",
+				"Kuspan",
+				"Something is important, but not this project",
+				"./images/avatars/somephoto.jpg",
+				"1994-09-18",
+				"123456")
+		} else {
+			log.Fatal(err)
+		}
+	}
 
 	r := gin.Default()
 

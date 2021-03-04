@@ -4,9 +4,11 @@ import (
 	"database/sql"
 	"log"
 
-	"git.01.alem.school/Kusbek/social-network/backend/pkg/db/sqlite"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+
+	"git.01.alem.school/Kusbek/social-network/backend/pkg/db/sqlite"
 )
 
 func main() {

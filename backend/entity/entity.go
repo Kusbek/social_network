@@ -7,10 +7,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+//ID ...
 type ID = int
 
 const layoutISO = "2006-01-02"
 
+//StringToTime ...
 func StringToTime(date string) time.Time {
 	d, err := time.Parse(layoutISO, date)
 	if err != nil {
@@ -19,7 +21,11 @@ func StringToTime(date string) time.Time {
 	return d
 }
 
+//TimeToString ...
 func TimeToString(date time.Time) string {
+	if date.IsZero() {
+		return ""
+	}
 	return date.Format(layoutISO)
 }
 
