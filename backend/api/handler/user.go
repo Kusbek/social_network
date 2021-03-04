@@ -2,17 +2,16 @@ package handler
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 
 	"git.01.alem.school/Kusbek/social-network/backend/api/presenter"
 	"git.01.alem.school/Kusbek/social-network/backend/entity"
 	"git.01.alem.school/Kusbek/social-network/backend/usecase/user"
 )
 
-func createUser(service user.UseCase) gin.HandlerFunc {
+func createUser(service user.UseCase) http.Handler {
 	var input struct {
 		Username    string `json:"username,omitempty"`
 		Email       string `json:"email,omitempty"`
@@ -23,10 +22,14 @@ func createUser(service user.UseCase) gin.HandlerFunc {
 		PathToPhoto string `json:"path_to_photo,omitempty"`
 		Password    string `json:"password,omitempty"`
 	}
-	return gin.HandlerFunc(func(c *gin.Context) {
-		err := c.ShouldBindJSON(&input)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			return
+		}
+		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
-			errorResponse(c, http.StatusBadRequest, err)
+			errorResponse(w, http.StatusBadRequest, err)
 			return
 		}
 		id, err := service.CreateUser(
@@ -51,34 +54,34 @@ func createUser(service user.UseCase) gin.HandlerFunc {
 			BirthDate:   input.BirthDate,
 		}
 
-		successResponse(c, http.StatusOK, userJSON)
+		successResponse(w, http.StatusOK, userJSON)
 	})
 }
 
-func authorizeUser(service user.UseCase) gin.HandlerFunc {
+func authorizeUser(service user.UseCase) http.HandlerFunc {
 	var input struct {
 		Credentials string `json:"creds"`
 		Password    string `json:"password"`
 	}
-	return gin.HandlerFunc(func(c *gin.Context) {
-		err := c.ShouldBindJSON(&input)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
-			errorResponse(c, http.StatusBadRequest, err)
+			errorResponse(w, http.StatusBadRequest, err)
 			return
 		}
 
 		user, err := service.FindUser(input.Credentials)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				errorResponse(c, http.StatusNotFound, fmt.Errorf("User not found"))
+				errorResponse(w, http.StatusNotFound, fmt.Errorf("User not found"))
 				return
 			}
-			errorResponse(c, http.StatusInternalServerError, err)
+			errorResponse(w, http.StatusInternalServerError, err)
 			return
 		}
 
 		if err = user.ComparePasswords(input.Password); err != nil {
-			errorResponse(c, http.StatusForbidden, err)
+			errorResponse(w, http.StatusForbidden, err)
 			return
 		}
 
@@ -93,13 +96,13 @@ func authorizeUser(service user.UseCase) gin.HandlerFunc {
 			BirthDate:   entity.TimeToString(user.BirthDate),
 		}
 
-		successResponse(c, http.StatusOK, userJSON)
+		successResponse(w, http.StatusOK, userJSON)
 	})
 }
 
 //MakeUserHandlers ...
-func MakeUserHandlers(r *gin.Engine, service user.UseCase) {
-	r.Handle(http.MethodPost, "/signup", createUser(service))
-	r.Handle(http.MethodPost, "/login", authorizeUser(service))
+func MakeUserHandlers(r *http.ServeMux, service user.UseCase) {
+	r.Handle("/signup", createUser(service))
+	r.Handle("/login", authorizeUser(service))
 
 }

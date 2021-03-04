@@ -2,11 +2,12 @@ package handler
 
 import (
 	"log"
-
-	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
-func errorResponse(c *gin.Context, code int, err error) {
+func errorResponse(w http.ResponseWriter, code int, err error) {
 	log.Println(err.Error())
-	c.String(code, err.Error())
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(code)
+	w.Write([]byte(err.Error()))
 }

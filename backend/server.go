@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 
 	"git.01.alem.school/Kusbek/social-network/backend/api/handler"
@@ -55,7 +54,7 @@ func main() {
 		}
 	}
 
-	r := gin.Default()
+	r := http.NewServeMux()
 
 	handler.MakeUserHandlers(r, userService)
 
@@ -66,6 +65,5 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-
 	s.ListenAndServe()
 }
