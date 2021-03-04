@@ -1,0 +1,1 @@
+migrate -database './local.db' -path ./pkg/db/migrations/sqlite up
