@@ -10,7 +10,7 @@ import (
 
 //User ...
 type User struct {
-	ID          int
+	ID          ID
 	Username    string
 	Email       string `validate:"email"`
 	FirstName   string

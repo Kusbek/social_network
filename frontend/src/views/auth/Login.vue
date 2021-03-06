@@ -11,15 +11,15 @@
 
 <script>
 import { ref } from "vue";
+import useLogin from '@/composables/useLogin.js'
 export default {
   setup() {
     const creds = ref("");
     const password = ref("");
     const isPending = ref(false);
-    const error = ref(null)
-
+    const {error, login} = useLogin()
     const handleSubmit = async () => {
-        console.log(creds.value, password.value)
+      await login(creds.value, password.value)
     };
 
 

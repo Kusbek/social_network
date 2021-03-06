@@ -5,13 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
-	"git.01.alem.school/Kusbek/social-network/backend/api/presenter"
+	"git.01.alem.school/Kusbek/social-network/backend/api/middleware"
 	"git.01.alem.school/Kusbek/social-network/backend/entity"
+	"git.01.alem.school/Kusbek/social-network/backend/usecase/session"
 	"git.01.alem.school/Kusbek/social-network/backend/usecase/user"
 )
 
-func createUser(service user.UseCase) http.Handler {
+func createUser(sessionService session.UseCase, userService user.UseCase) http.HandlerFunc {
 	var input struct {
 		Username    string `json:"username,omitempty"`
 		Email       string `json:"email,omitempty"`
@@ -32,7 +34,7 @@ func createUser(service user.UseCase) http.Handler {
 			errorResponse(w, http.StatusBadRequest, err)
 			return
 		}
-		id, err := service.CreateUser(
+		u, err := userService.CreateUser(
 			input.Username,
 			input.Email,
 			input.FirstName,
@@ -42,23 +44,28 @@ func createUser(service user.UseCase) http.Handler {
 			input.BirthDate,
 			input.Password,
 		)
-
-		userJSON := &presenter.User{
-			ID:          id,
-			Username:    input.Username,
-			Email:       input.Email,
-			FirstName:   input.FirstName,
-			LastName:    input.LastName,
-			AboutMe:     input.AboutMe,
-			PathToPhoto: input.PathToPhoto,
-			BirthDate:   input.BirthDate,
+		if err != nil {
+			errorResponse(w, http.StatusInternalServerError, err)
+			return
 		}
 
-		successResponse(w, http.StatusOK, userJSON)
+		// userJSON := &presenter.User{
+		// 	ID:          u.ID,
+		// 	Username:    input.Username,
+		// 	Email:       input.Email,
+		// 	FirstName:   input.FirstName,
+		// 	LastName:    input.LastName,
+		// 	AboutMe:     input.AboutMe,
+		// 	PathToPhoto: input.PathToPhoto,
+		// 	BirthDate:   input.BirthDate,
+		// }
+
+		setCookie(w, sessionService, u)
+		successResponse(w, http.StatusOK, map[string]bool{"success": true})
 	})
 }
 
-func authorizeUser(service user.UseCase) http.HandlerFunc {
+func authorizeUser(sessionService session.UseCase, userService user.UseCase) http.HandlerFunc {
 	var input struct {
 		Credentials string `json:"creds"`
 		Password    string `json:"password"`
@@ -70,7 +77,7 @@ func authorizeUser(service user.UseCase) http.HandlerFunc {
 			return
 		}
 
-		user, err := service.FindUser(input.Credentials)
+		u, err := userService.FindUser(input.Credentials)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				errorResponse(w, http.StatusNotFound, fmt.Errorf("User not found"))
@@ -80,29 +87,40 @@ func authorizeUser(service user.UseCase) http.HandlerFunc {
 			return
 		}
 
-		if err = user.ComparePasswords(input.Password); err != nil {
+		if err = u.ComparePasswords(input.Password); err != nil {
 			errorResponse(w, http.StatusForbidden, err)
 			return
 		}
 
-		userJSON := &presenter.User{
-			ID:          user.ID,
-			Username:    user.Username,
-			Email:       user.Email,
-			FirstName:   user.FirstName,
-			LastName:    user.LastName,
-			AboutMe:     user.AboutMe,
-			PathToPhoto: user.PathToPhoto,
-			BirthDate:   entity.TimeToString(user.BirthDate),
-		}
-
-		successResponse(w, http.StatusOK, userJSON)
+		// userJSON := &presenter.User{
+		// 	ID:          u.ID,
+		// 	Username:    u.Username,
+		// 	Email:       u.Email,
+		// 	FirstName:   u.FirstName,
+		// 	LastName:    u.LastName,
+		// 	AboutMe:     u.AboutMe,
+		// 	PathToPhoto: u.PathToPhoto,
+		// 	BirthDate:   entity.TimeToString(u.BirthDate),
+		// }
+		setCookie(w, sessionService, u)
+		successResponse(w, http.StatusOK, map[string]bool{"success": true})
 	})
 }
 
+//s ...
+func setCookie(w http.ResponseWriter, service session.UseCase, user *entity.User) {
+	cookie := http.Cookie{
+		Name:    "session_id",
+		Value:   service.CreateSession(user),
+		Expires: time.Now().Add(10 * time.Hour),
+	}
+	fmt.Println(cookie.Value, user)
+	http.SetCookie(w, &cookie)
+}
+
 //MakeUserHandlers ...
-func MakeUserHandlers(r *http.ServeMux, service user.UseCase) {
-	r.Handle("/signup", createUser(service))
-	r.Handle("/login", authorizeUser(service))
+func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userService user.UseCase) {
+	r.Handle("/signup", middleware.Cors(createUser(sessionService, userService)))
+	r.Handle("/login", middleware.Cors(authorizeUser(sessionService, userService)))
 
 }

@@ -47,7 +47,7 @@ export default {
     const confirmPassword = ref("");
     const isPending = ref(false);
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
       validateUser(
         username.value,
         email.value,
@@ -58,7 +58,7 @@ export default {
         return;
       }
 
-      signup(
+      await signup(
         username.value,
         email.value,
         firstName.value,

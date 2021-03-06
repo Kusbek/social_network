@@ -17,12 +17,17 @@ func NewService(r Repository) *Service {
 }
 
 //CreateUser ...
-func (s *Service) CreateUser(username, email, firstName, lastName, aboutMe, pathToPhoto, birhDate, password string) (entity.ID, error) {
+func (s *Service) CreateUser(username, email, firstName, lastName, aboutMe, pathToPhoto, birhDate, password string) (*entity.User, error) {
 	u, err := entity.NewUser(username, email, firstName, lastName, aboutMe, pathToPhoto, birhDate, password)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return s.repo.Create(u)
+	id, err := s.repo.Create(u)
+	if err != nil {
+		return nil, err
+	}
+	u.ID = id
+	return u, nil
 }
 
 //FindUser ...

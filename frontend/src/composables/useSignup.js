@@ -6,7 +6,7 @@ const error = ref(null)
 
 const signup = async (username, email, firstName, lastName, birthDate, aboutMe, password) => {
     error.value = null
-    let user = {
+    let body = {
         username: username,
         email: email,
         first_name: firstName,
@@ -15,8 +15,19 @@ const signup = async (username, email, firstName, lastName, birthDate, aboutMe, 
         about_me: aboutMe,
         password: password,
     }
-    console.log(JSON.stringify(user))
-    // error.value = "Failed to signup, please try later"
+    try {
+        let res = await fetch("http://localhost:8080/signup", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body)
+        })
+        if (!res.ok) {
+            throw Error("Failed to sign up")
+        }
+    } catch (err) {
+        error.value = err.message
+        console.log(err.message)
+    }
 }
 
 const useSignup = () => {

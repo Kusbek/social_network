@@ -1,4 +1,4 @@
-package session
+package repository
 
 import (
 	"errors"
@@ -10,27 +10,21 @@ import (
 	"git.01.alem.school/Kusbek/social-network/backend/entity"
 )
 
-//Session ...
-type Session interface {
-	Insert(*entity.User) string
-	GetUser(string) (*entity.User, error)
-	Delete(string)
-}
-
 type session struct {
 	user       *entity.User
 	expireTime time.Time
 }
 
-type cookie struct {
+//SessionRepository ...
+type SessionRepository struct {
 	expiration time.Duration
 	sessions   map[string]*session
 	mu         *sync.Mutex
 }
 
-//New ...
-func New() Session {
-	c := &cookie{
+//NewSessionRepository ...
+func NewSessionRepository() *SessionRepository {
+	c := &SessionRepository{
 		expiration: 10,
 		sessions:   make(map[string]*session),
 		mu:         &sync.Mutex{},
@@ -39,7 +33,8 @@ func New() Session {
 	return c
 }
 
-func (c *cookie) Insert(u *entity.User) string {
+//Create ...
+func (c *SessionRepository) Create(u *entity.User) string {
 	uuid := shortuuid.New()
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -47,7 +42,8 @@ func (c *cookie) Insert(u *entity.User) string {
 	return uuid
 }
 
-func (c *cookie) GetUser(uuid string) (*entity.User, error) {
+//Get ...
+func (c *SessionRepository) Get(uuid string) (*entity.User, error) {
 	session, ok := c.sessions[uuid]
 	if !ok {
 		return nil, errors.New("Unauthorized")
@@ -55,13 +51,14 @@ func (c *cookie) GetUser(uuid string) (*entity.User, error) {
 	return session.user, nil
 }
 
-func (c *cookie) Delete(uuid string) {
+//Delete ...
+func (c *SessionRepository) Delete(uuid string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	delete(c.sessions, uuid)
 }
 
-func (c *cookie) monitor() {
+func (c *SessionRepository) monitor() {
 	for {
 		// fmt.Println("cookie monitoring!!!")
 		time.Sleep(10 * time.Second)

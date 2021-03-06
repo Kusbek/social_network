@@ -12,6 +12,7 @@ import (
 	"git.01.alem.school/Kusbek/social-network/backend/api/handler"
 	"git.01.alem.school/Kusbek/social-network/backend/pkg/db/repository"
 	"git.01.alem.school/Kusbek/social-network/backend/pkg/db/sqlite"
+	"git.01.alem.school/Kusbek/social-network/backend/usecase/session"
 	"git.01.alem.school/Kusbek/social-network/backend/usecase/user"
 )
 
@@ -33,9 +34,31 @@ func main() {
 		}
 	}()
 
+	r := http.NewServeMux()
+	userService := newUser(db)
+	sessionService := newSession()
+	handler.MakeUserHandlers(r, sessionService, userService)
+
+	s := &http.Server{
+		Addr:           fmt.Sprintf(":%d", apiPort),
+		Handler:        r,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	s.ListenAndServe()
+}
+
+func newSession() session.UseCase {
+	repo := repository.NewSessionRepository()
+	sessionService := session.NewService(repo)
+	return sessionService
+}
+
+func newUser(db *sql.DB) user.UseCase {
 	userRepo := repository.NewUserRepository(db)
 	userService := user.NewService(userRepo)
-	_, err = userService.FindUser(
+	_, err := userService.FindUser(
 		"kusbek",
 	)
 	if err != nil {
@@ -54,16 +77,5 @@ func main() {
 		}
 	}
 
-	r := http.NewServeMux()
-
-	handler.MakeUserHandlers(r, userService)
-
-	s := &http.Server{
-		Addr:           fmt.Sprintf(":%d", apiPort),
-		Handler:        r,
-		ReadTimeout:    10 * time.Second,
-		WriteTimeout:   10 * time.Second,
-		MaxHeaderBytes: 1 << 20,
-	}
-	s.ListenAndServe()
+	return userService
 }
