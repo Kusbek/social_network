@@ -73,7 +73,7 @@ export default {
         return;
       }
 
-      router.push({name: "Profile"})
+      router.push({name: "MainPage"})
     };
 
     return {

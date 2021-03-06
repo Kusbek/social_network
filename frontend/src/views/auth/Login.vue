@@ -12,14 +12,17 @@
 <script>
 import { ref } from "vue";
 import useLogin from '@/composables/useLogin.js'
+import { useRouter } from "vue-router";
 export default {
   setup() {
+  const router = useRouter();
     const creds = ref("");
     const password = ref("");
     const isPending = ref(false);
     const {error, login} = useLogin()
     const handleSubmit = async () => {
       await login(creds.value, password.value)
+      // router.push({name: "MainPage"})
     };
 
 

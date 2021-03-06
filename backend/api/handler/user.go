@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"git.01.alem.school/Kusbek/social-network/backend/api/middleware"
+	"git.01.alem.school/Kusbek/social-network/backend/api/presenter"
 	"git.01.alem.school/Kusbek/social-network/backend/entity"
 	"git.01.alem.school/Kusbek/social-network/backend/usecase/session"
 	"git.01.alem.school/Kusbek/social-network/backend/usecase/user"
@@ -71,6 +72,10 @@ func authorizeUser(sessionService session.UseCase, userService user.UseCase) htt
 		Password    string `json:"password"`
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			return
+		}
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
 			errorResponse(w, http.StatusBadRequest, err)
@@ -107,12 +112,45 @@ func authorizeUser(sessionService session.UseCase, userService user.UseCase) htt
 	})
 }
 
-//s ...
+func authenticate(sessionService session.UseCase) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			return
+		}
+		cookie, err := r.Cookie("session_id")
+		fmt.Println("Cookies: ", cookie.Value)
+		if err == http.ErrNoCookie {
+			errorResponse(w, http.StatusUnauthorized, fmt.Errorf("Unauthorized, No Cookie"))
+			return
+		}
+
+		u, err := sessionService.GetSession(cookie.Value)
+		if err != nil {
+			errorResponse(w, http.StatusUnauthorized, fmt.Errorf("Unauthorized"))
+			return
+		}
+
+		userJSON := &presenter.User{
+			ID:          u.ID,
+			Username:    u.Username,
+			Email:       u.Email,
+			FirstName:   u.FirstName,
+			LastName:    u.LastName,
+			AboutMe:     u.AboutMe,
+			PathToPhoto: u.PathToPhoto,
+			BirthDate:   entity.TimeToString(u.BirthDate),
+		}
+		successResponse(w, http.StatusOK, userJSON)
+	})
+}
+
 func setCookie(w http.ResponseWriter, service session.UseCase, user *entity.User) {
 	cookie := http.Cookie{
 		Name:    "session_id",
 		Value:   service.CreateSession(user),
 		Expires: time.Now().Add(10 * time.Hour),
+		Path:    "/",
 	}
 	fmt.Println(cookie.Value, user)
 	http.SetCookie(w, &cookie)
@@ -122,5 +160,5 @@ func setCookie(w http.ResponseWriter, service session.UseCase, user *entity.User
 func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userService user.UseCase) {
 	r.Handle("/signup", middleware.Cors(createUser(sessionService, userService)))
 	r.Handle("/login", middleware.Cors(authorizeUser(sessionService, userService)))
-
+	r.Handle("/auth", middleware.Cors(authenticate(sessionService)))
 }
