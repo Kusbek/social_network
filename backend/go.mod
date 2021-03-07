@@ -3,7 +3,7 @@ module git.01.alem.school/Kusbek/social-network/backend
 go 1.15
 
 require (
-	github.com/gin-gonic/gin v1.6.3
+	github.com/go-playground/universal-translator v0.17.0 // indirect
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/golang-migrate/migrate/v4 v4.14.1
 	github.com/leodido/go-urn v1.2.1 // indirect

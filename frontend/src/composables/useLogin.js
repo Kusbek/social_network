@@ -12,7 +12,7 @@ const login = async (creds, password) => {
     }
     console.log(JSON.stringify(data))
     try {
-        let res = await fetch("http://localhost:8080/login", {
+        let res = await fetch("./api/login", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(data)

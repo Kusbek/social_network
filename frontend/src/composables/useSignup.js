@@ -16,7 +16,7 @@ const signup = async (username, email, firstName, lastName, birthDate, aboutMe, 
         password: password,
     }
     try {
-        let res = await fetch("http://localhost:8080/signup", {
+        let res = await fetch("./api/signup", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify(body)

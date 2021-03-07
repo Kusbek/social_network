@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"git.01.alem.school/Kusbek/social-network/backend/api/middleware"
 	"git.01.alem.school/Kusbek/social-network/backend/api/presenter"
 	"git.01.alem.school/Kusbek/social-network/backend/entity"
 	"git.01.alem.school/Kusbek/social-network/backend/usecase/session"
@@ -158,7 +157,7 @@ func setCookie(w http.ResponseWriter, service session.UseCase, user *entity.User
 
 //MakeUserHandlers ...
 func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userService user.UseCase) {
-	r.Handle("/signup", middleware.Cors(createUser(sessionService, userService)))
-	r.Handle("/login", middleware.Cors(authorizeUser(sessionService, userService)))
-	r.Handle("/auth", middleware.Cors(authenticate(sessionService)))
+	r.Handle("/api/signup", createUser(sessionService, userService))
+	r.Handle("/api/login", authorizeUser(sessionService, userService))
+	r.Handle("/api/auth", authenticate(sessionService))
 }

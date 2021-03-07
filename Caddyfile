@@ -1,0 +1,14 @@
+# The domain you want to use
+:2016 {
+	log {
+		output stdout
+		level DEBUG
+	}
+
+	root frontend/dist
+	route {
+		reverse_proxy /api* 127.0.0.1:8080
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+}
