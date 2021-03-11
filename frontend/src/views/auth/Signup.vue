@@ -30,11 +30,11 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import useValidators from "@/composables/useValidators";
-import useSignup from "@/composables/useSignup";
+import User from "@/composables/user";
 
 export default {
   setup() {
-    const { error: signupError, signup } = useSignup();
+    const { error: signupError, signup } = User();
     const { error: validationErr, validateUser } = useValidators();
     const router = useRouter();
     const username = ref("");

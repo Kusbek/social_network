@@ -1,12 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import getUser from '../composables/getUser'
-import Profile from '../views/Profile.vue'
+import User from '../composables/user'
+
 import Login from '../views/auth/Login.vue'
 import Signup from '../views/auth/Signup.vue'
 import MainPage from '../views/MainPage.vue'
 
-const requireAuth = (to, from, next) => {
-  const { user } = getUser()
+const requireNotAuth = async (to, from, next) => {
+  const { user, getUser } = User()
+  await getUser()
+  if(!user.value) {
+    next()
+  } else {
+    next({name: 'MainPage'})
+  }
+}
+
+const requireAuth = async (to, from, next) => {
+  const { user, getUser } = User()
+  await getUser()
   if(!user.value) {
     next({name: 'Login'})
   } else {
@@ -19,23 +30,19 @@ const routes = [
     path: '/',
     name: 'MainPage',
     component: MainPage,
-  },
-  {
-    path: '/{id}',
-    name: 'Profile',
-    component: Profile,
     beforeEnter: requireAuth,
-    props: true
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    beforeEnter:requireNotAuth,
   },
   {
     path: '/signup',
     name: 'Signup',
-    component: Signup
+    component: Signup,
+    beforeEnter:requireNotAuth,
   }
 ]
 

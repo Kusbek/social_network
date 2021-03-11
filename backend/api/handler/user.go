@@ -13,7 +13,7 @@ import (
 	"git.01.alem.school/Kusbek/social-network/backend/usecase/user"
 )
 
-func createUser(sessionService session.UseCase, userService user.UseCase) http.HandlerFunc {
+func signup(sessionService session.UseCase, userService user.UseCase) http.HandlerFunc {
 	var input struct {
 		Username    string `json:"username,omitempty"`
 		Email       string `json:"email,omitempty"`
@@ -65,7 +65,7 @@ func createUser(sessionService session.UseCase, userService user.UseCase) http.H
 	})
 }
 
-func authorizeUser(sessionService session.UseCase, userService user.UseCase) http.HandlerFunc {
+func login(sessionService session.UseCase, userService user.UseCase) http.HandlerFunc {
 	var input struct {
 		Credentials string `json:"creds"`
 		Password    string `json:"password"`
@@ -118,7 +118,6 @@ func authenticate(sessionService session.UseCase) http.HandlerFunc {
 			return
 		}
 		cookie, err := r.Cookie("session_id")
-		fmt.Println("Cookies: ", cookie.Value)
 		if err == http.ErrNoCookie {
 			errorResponse(w, http.StatusUnauthorized, fmt.Errorf("Unauthorized, No Cookie"))
 			return
@@ -144,6 +143,32 @@ func authenticate(sessionService session.UseCase) http.HandlerFunc {
 	})
 }
 
+func logout(sessionService session.UseCase) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			return
+		}
+		cookie, err := r.Cookie("session_id")
+		if err == http.ErrNoCookie {
+			successResponse(w, http.StatusOK, map[string]interface{}{
+				"success": true,
+			})
+			return
+		}
+		deleteCookie(w, sessionService, cookie)
+		successResponse(w, http.StatusOK, map[string]interface{}{
+			"success": true,
+		})
+	})
+}
+
+func deleteCookie(w http.ResponseWriter, sessionService session.UseCase, cookie *http.Cookie) {
+	sessionService.DeleteSession(cookie.Value)
+	cookie.Expires = time.Now().AddDate(0, 0, -1)
+	http.SetCookie(w, cookie)
+}
+
 func setCookie(w http.ResponseWriter, service session.UseCase, user *entity.User) {
 	cookie := http.Cookie{
 		Name:    "session_id",
@@ -157,7 +182,8 @@ func setCookie(w http.ResponseWriter, service session.UseCase, user *entity.User
 
 //MakeUserHandlers ...
 func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userService user.UseCase) {
-	r.Handle("/api/signup", createUser(sessionService, userService))
-	r.Handle("/api/login", authorizeUser(sessionService, userService))
+	r.Handle("/api/signup", signup(sessionService, userService))
+	r.Handle("/api/login", login(sessionService, userService))
 	r.Handle("/api/auth", authenticate(sessionService))
+	r.Handle("/api/logout", logout(sessionService))
 }
