@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"git.01.alem.school/Kusbek/social-network/api/presenter"
@@ -163,6 +164,25 @@ func logout(sessionService session.UseCase) http.HandlerFunc {
 	})
 }
 
+func getUser(userService user.UseCase) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("GAVNOJUI")
+		if r.Method != "GET" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			return
+		}
+
+		id, err := strconv.Atoi(r.URL.Query().Get("id"))
+		if err != nil {
+			errorResponse(w, http.StatusBadRequest, fmt.Errorf("id is a required parameter"))
+			return
+		}
+
+		user, err := userService.GetUser(id)
+		successResponse(w, http.StatusOK, user)
+	})
+}
+
 func deleteCookie(w http.ResponseWriter, sessionService session.UseCase, cookie *http.Cookie) {
 	sessionService.DeleteSession(cookie.Value)
 	cookie.Expires = time.Now().AddDate(0, 0, -1)
@@ -186,4 +206,5 @@ func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userServ
 	r.Handle("/api/login", login(sessionService, userService))
 	r.Handle("/api/auth", authenticate(sessionService))
 	r.Handle("/api/logout", logout(sessionService))
+	r.Handle("/api/user", getUser(userService))
 }

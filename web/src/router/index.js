@@ -28,7 +28,7 @@ const requireAuth = async (to, from, next) => {
 
 const routes = [
   {
-    path: '/user/:id',
+    path: '/:id',
     name: 'Profile',
     component: Profile,
     props: true,

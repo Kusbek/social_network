@@ -24,4 +24,5 @@ type Repository interface {
 type UseCase interface {
 	CreateUser(username, email, firstName, lastName, aboutMe, pathToPhoto, birhDate, password string) (*entity.User, error)
 	FindUser(nickmail string) (*entity.User, error)
+	GetUser(id int) (*entity.User, error)
 }

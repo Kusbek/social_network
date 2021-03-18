@@ -39,7 +39,6 @@ func main() {
 	sessionService := newSession()
 
 	handler.MakeUserHandlers(r, sessionService, userService)
-
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", apiPort),
 		Handler:        r,
