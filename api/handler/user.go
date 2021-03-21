@@ -178,8 +178,26 @@ func getUser(userService user.UseCase) http.HandlerFunc {
 			return
 		}
 
-		user, err := userService.GetUser(id)
-		successResponse(w, http.StatusOK, user)
+		u, err := userService.GetUser(id)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				errorResponse(w, http.StatusNotFound, err)
+				return
+			}
+			errorResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+		userJSON := &presenter.User{
+			ID:          u.ID,
+			Username:    u.Username,
+			Email:       u.Email,
+			FirstName:   u.FirstName,
+			LastName:    u.LastName,
+			AboutMe:     u.AboutMe,
+			PathToPhoto: u.PathToPhoto,
+			BirthDate:   entity.TimeToString(u.BirthDate),
+		}
+		successResponse(w, http.StatusOK, userJSON)
 	})
 }
 

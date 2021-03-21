@@ -63,15 +63,18 @@ func newUser(db *sql.DB) user.UseCase {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			userService.CreateUser(
+			_, err = userService.CreateUser(
 				"kusbek",
 				"kusbek1994@gmail.com",
 				"Bekarys",
 				"Kuspan",
 				"Something is important, but not this project",
-				"./images/avatars/somephoto.jpg",
+				"/img/images/avatars/somePhoto.jpg",
 				"1994-09-18",
 				"123456")
+			if err != nil {
+				log.Fatal(err)
+			}
 		} else {
 			log.Fatal(err)
 		}

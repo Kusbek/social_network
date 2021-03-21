@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"git.01.alem.school/Kusbek/social-network/entity"
 )
@@ -22,9 +23,17 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 func (r *UserRepository) Create(user *entity.User) (entity.ID, error) {
 	res, err := r.db.Exec(
 		`
-		INSERT INTO users (username, email, first_name, last_name, birth_date, path_to_photo, password)
-		VALUES($1,$2,$3,$4,$5,$6,$7)
-		`, user.Username, user.Email, user.FirstName, user.LastName, user.BirthDate, user.PathToPhoto, user.Password)
+		INSERT INTO users (username, email, first_name, last_name, birth_date, path_to_photo, about_me, password)
+		VALUES($1,$2,$3,$4,$5,$6,$7,$8)
+		`,
+		user.Username,
+		user.Email,
+		user.FirstName,
+		user.LastName,
+		entity.TimeToString(user.BirthDate),
+		user.PathToPhoto,
+		user.AboutMe,
+		user.Password)
 	if err != nil {
 		return 0, err
 	}
@@ -43,6 +52,29 @@ func (r *UserRepository) Find(nickmail string) (*entity.User, error) {
 		&user.Username,
 		&user.Password,
 	)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+//Get ...
+func (r *UserRepository) Get(id int) (*entity.User, error) {
+	user := &entity.User{}
+	var birthDate string
+	err := r.db.QueryRow(`SELECT id, username, email, first_name, last_name, about_me, path_to_photo, birth_date FROM users WHERE id=$1`, id).Scan(
+		&user.ID,
+		&user.Username,
+		&user.Email,
+		&user.FirstName,
+		&user.LastName,
+		&user.AboutMe,
+		&user.PathToPhoto,
+		&birthDate,
+	)
+	user.BirthDate = entity.StringToTime(birthDate)
+	fmt.Println(user.BirthDate)
 	if err != nil {
 		return nil, err
 	}

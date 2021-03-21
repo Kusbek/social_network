@@ -4,13 +4,13 @@
     <div v-if="profile" class="profile-details">
       <div class="profile-info">
         <div class="avatar">
-          <img src="@/assets/ninja.jpg" />
+          <img :src="profile.path_to_photo" />
         </div>
-        <h2>{{ profile.firstName }} {{ profile.lastName }}</h2>
+        <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
         <p class="info">username: {{ profile.username }}</p>
         <p class="info">email: {{ profile.email }}</p>
-        <p class="info">birth date: {{ profile.birthDate }}</p>
-        <p class="info">About me: {{ profile.aboutMe }}</p>
+        <p class="info">birth date: {{ profile.birth_date }}</p>
+        <p class="info">About me: {{ profile.about_me }}</p>
       </div>
       <PostList />
     </div>
@@ -20,7 +20,7 @@
 <script>
 import useProfile from "@/composables/profile.js";
 import PostList from "../components/PostList";
-import { onMounted } from '@vue/runtime-core';
+
 export default {
   props: ["id"],
   components: { PostList },

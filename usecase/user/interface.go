@@ -7,6 +7,7 @@ import (
 //Reader ...
 type Reader interface {
 	Find(nickmail string) (*entity.User, error)
+	Get(id int) (*entity.User, error)
 }
 
 //Writer ...

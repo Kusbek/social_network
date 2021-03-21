@@ -4,11 +4,15 @@
 		output stdout
 		level DEBUG
 	}
+	route /api/* {
+		reverse_proxy localhost:8080
+	}
 
-	root web/dist
-	route {
-		reverse_proxy /api* 127.0.0.1:8080
-		try_files {path} {path}/ /index.html
-		file_server
+	root * web/dist
+
+	route /* {
+		# always redirect non existing files to index.html for the SPA
+		try_files {path} /index.html
+		file_server /*
 	}
 }

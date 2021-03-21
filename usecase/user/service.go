@@ -37,13 +37,15 @@ func (s *Service) FindUser(nickmail string) (*entity.User, error) {
 
 //FindUser ...
 func (s *Service) GetUser(id int) (*entity.User, error) {
-	return &entity.User{
-		ID:        id,
-		Username:  "kusbek",
-		Email:     "kusbek1994@gmail.com",
-		FirstName: "Bekarys",
-		LastName:  "Kuspan",
-		BirthDate: entity.StringToTime("1994-09-18"),
-		AboutMe:   "lorem ipsum vsyakaya hren liw by zapolnit eto pole",
-	}, nil
+	// return &entity.User{
+	// 	ID:        id,
+	// 	Username:  "kusbek",
+	// 	Email:     "kusbek1994@gmail.com",
+	// 	FirstName: "Bekarys",
+	// 	LastName:  "Kuspan",
+	// 	BirthDate: entity.StringToTime("1994-09-18"),
+	// 	AboutMe:   "lorem ipsum vsyakaya hren liw by zapolnit eto pole",
+	// }, nil
+
+	return s.repo.Get(id)
 }
