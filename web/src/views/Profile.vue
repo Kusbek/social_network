@@ -6,11 +6,13 @@
         <div class="avatar">
           <img :src="profile.path_to_photo" />
         </div>
+        <button @click="uploadPhoto">Upload an avatar</button>
         <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
         <p class="info">username: {{ profile.username }}</p>
         <p class="info">email: {{ profile.email }}</p>
         <p class="info">birth date: {{ profile.birth_date }}</p>
         <p class="info">About me: {{ profile.about_me }}</p>
+
       </div>
       <PostList />
     </div>
@@ -27,9 +29,14 @@ export default {
   setup(props) {
     const { profile, error, load } = useProfile();
     load(props.id);
+
+    const uploadPhoto = () => {
+
+    }
     return {
       profile,
       error,
+      uploadPhoto,
     };
   },
 };
