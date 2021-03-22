@@ -93,6 +93,7 @@ const login = async (creds, password) => {
 }
 
 const User = () => {
+    error.value = null
     return {
         error,
         user,

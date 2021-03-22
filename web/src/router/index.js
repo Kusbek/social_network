@@ -32,6 +32,7 @@ const routes = [
     name: 'Profile',
     component: Profile,
     props: true,
+    beforeEnter:requireAuth,
   },
   {
     path: '/',
