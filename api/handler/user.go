@@ -27,7 +27,7 @@ func signup(sessionService session.UseCase, userService user.UseCase) http.Handl
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
 			return
 		}
 		err := json.NewDecoder(r.Body).Decode(&input)
@@ -73,7 +73,7 @@ func login(sessionService session.UseCase, userService user.UseCase) http.Handle
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
 			return
 		}
 		err := json.NewDecoder(r.Body).Decode(&input)
@@ -85,7 +85,7 @@ func login(sessionService session.UseCase, userService user.UseCase) http.Handle
 		u, err := userService.FindUser(input.Credentials)
 		if err != nil {
 			if err == sql.ErrNoRows {
-				errorResponse(w, http.StatusNotFound, fmt.Errorf("User not found"))
+				errorResponse(w, http.StatusNotFound, fmt.Errorf("user not found"))
 				return
 			}
 			errorResponse(w, http.StatusInternalServerError, err)
@@ -115,18 +115,18 @@ func login(sessionService session.UseCase, userService user.UseCase) http.Handle
 func authenticate(sessionService session.UseCase) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
 			return
 		}
 		cookie, err := r.Cookie("session_id")
 		if err == http.ErrNoCookie {
-			errorResponse(w, http.StatusUnauthorized, fmt.Errorf("Unauthorized, No Cookie"))
+			errorResponse(w, http.StatusUnauthorized, fmt.Errorf("unauthorized, no cookie"))
 			return
 		}
 
 		u, err := sessionService.GetSession(cookie.Value)
 		if err != nil {
-			errorResponse(w, http.StatusUnauthorized, fmt.Errorf("Unauthorized"))
+			errorResponse(w, http.StatusUnauthorized, fmt.Errorf("unauthorized"))
 			return
 		}
 
@@ -147,7 +147,7 @@ func authenticate(sessionService session.UseCase) http.HandlerFunc {
 func logout(sessionService session.UseCase) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
 			return
 		}
 		cookie, err := r.Cookie("session_id")
@@ -168,7 +168,7 @@ func getUser(userService user.UseCase) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("GAVNOJUI")
 		if r.Method != "GET" {
-			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("Wrong Method"))
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
 			return
 		}
 
