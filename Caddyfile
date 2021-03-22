@@ -7,8 +7,11 @@
 	route /api/* {
 		reverse_proxy localhost:8080
 	}
+	route /images/* {
+		file_server
+	}
 
-	root * web/dist
+	root * dist
 
 	route /* {
 		# always redirect non existing files to index.html for the SPA

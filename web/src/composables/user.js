@@ -24,7 +24,7 @@ const getUser = async () => {
     }
 }
 
-const signup = async (username, email, firstName, lastName, birthDate, aboutMe, password) => {
+const signup = async (username, email, firstName, lastName, birthDate, aboutMe, password, pathToPhoto) => {
     error.value = null
     user.value = null
     let body = {
@@ -34,6 +34,7 @@ const signup = async (username, email, firstName, lastName, birthDate, aboutMe, 
         last_name: lastName,
         birth_date: birthDate,
         about_me: aboutMe,
+        path_to_photo: pathToPhoto,
         password: password,
     }
     try {

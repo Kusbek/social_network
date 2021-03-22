@@ -38,6 +38,7 @@ func main() {
 	userService := newUser(db)
 	sessionService := newSession()
 
+	handler.MakeFileHandlers(r)
 	handler.MakeUserHandlers(r, sessionService, userService)
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", apiPort),
