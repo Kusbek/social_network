@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func uploadImage() http.Handler {
+func uploadFile(pathToImage string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Maximum upload of 10 MB files
 		r.ParseMultipartForm(10 << 20)
@@ -21,7 +21,7 @@ func uploadImage() http.Handler {
 		defer file.Close()
 
 		// Create file
-		dst, err := os.Create("./dist/img/" + handler.Filename)
+		dst, err := os.Create(fmt.Sprintf("./dist/img/%v/%v", pathToImage, handler.Filename))
 		if err != nil {
 			errorResponse(w, http.StatusInternalServerError, err)
 			return
@@ -35,11 +35,11 @@ func uploadImage() http.Handler {
 		}
 
 		successResponse(w, http.StatusCreated, map[string]interface{}{
-			"path_to_photo": fmt.Sprintf("/img/%v", handler.Filename),
+			"path_to_photo": fmt.Sprintf("/img/%v/%v", pathToImage, handler.Filename),
 		})
 	})
 }
 
 func MakeFileHandlers(r *http.ServeMux) {
-	r.Handle("/api/upload", uploadImage())
+	r.Handle("/api/upload", uploadFile("avatars"))
 }
