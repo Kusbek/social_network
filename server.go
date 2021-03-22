@@ -59,27 +59,27 @@ func newSession() session.UseCase {
 func newUser(db *sql.DB) user.UseCase {
 	userRepo := repository.NewUserRepository(db)
 	userService := user.NewService(userRepo)
-	_, err := userService.FindUser(
-		"kusbek",
-	)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			_, err = userService.CreateUser(
-				"kusbek",
-				"kusbek1994@gmail.com",
-				"Bekarys",
-				"Kuspan",
-				"Something is important, but not this project",
-				"/img/images/avatars/somePhoto.jpg",
-				"1994-09-18",
-				"123456")
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
-			log.Fatal(err)
-		}
-	}
+	// _, err := userService.FindUser(
+	// 	"kusbek",
+	// )
+	// if err != nil {
+	// 	if err == sql.ErrNoRows {
+	// 		_, err = userService.CreateUser(
+	// 			"kusbek",
+	// 			"kusbek1994@gmail.com",
+	// 			"Bekarys",
+	// 			"Kuspan",
+	// 			"Something is important, but not this project",
+	// 			"/img/images/avatars/somePhoto.jpg",
+	// 			"1994-09-18",
+	// 			"123456")
+	// 		if err != nil {
+	// 			log.Fatal(err)
+	// 		}
+	// 	} else {
+	// 		log.Fatal(err)
+	// 	}
+	// }
 
 	return userService
 }

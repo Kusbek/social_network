@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build --dest ../dist"
+    "prebuild": "mv ../dist/img/ ../img/",
+    "build": "vue-cli-service build --dest ../dist",
+    "postbuild": "rm -rf ../dist/img/ && mv ../img/ ../dist/"
   },
   "dependencies": {
     "core-js": "^3.6.5",
