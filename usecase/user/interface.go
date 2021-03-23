@@ -12,6 +12,7 @@ type Reader interface {
 
 //Writer ...
 type Writer interface {
+	Follow(userID int, followingID int) error
 	Create(user *entity.User) (entity.ID, error)
 }
 
@@ -26,4 +27,5 @@ type UseCase interface {
 	CreateUser(username, email, firstName, lastName, aboutMe, pathToPhoto, birhDate, password string) (*entity.User, error)
 	FindUser(nickmail string) (*entity.User, error)
 	GetUser(id int) (*entity.User, error)
+	Follow(userID, followingID int) error
 }

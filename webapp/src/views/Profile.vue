@@ -6,12 +6,15 @@
         <div class="avatar">
           <img :src="profile.path_to_photo" />
         </div>
+        <!-- <div class="subscription" v-if="profile.id !== user.id">
+          <button @click="handleSubscription">{{ subscriptionText }}</button>
+        </div> -->
+        <FollowButton :profile="profile"/>
         <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
         <p class="info">username: {{ profile.username }}</p>
         <p class="info">email: {{ profile.email }}</p>
         <p class="info">birth date: {{ profile.birth_date }}</p>
         <p class="info">About me: {{ profile.about_me }}</p>
-
       </div>
       <PostList />
     </div>
@@ -21,16 +24,19 @@
 <script>
 import useProfile from "@/composables/profile.js";
 import PostList from "../components/PostList";
+import FollowButton from "../components/FollowButton";
+
 
 export default {
   props: ["id"],
-  components: { PostList },
+  components: { PostList, FollowButton },
   setup(props) {
-    const { profile, error, load } = useProfile();
+    const { profile, error, load} = useProfile();
     load(props.id);
+
     return {
       profile,
-      error
+      error,
     };
   },
 };
@@ -48,13 +54,16 @@ export default {
 .profile-info h2 {
   text-transform: capitalize;
   font-size: 28px;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .profile-info p {
   margin-bottom: 10px;
 }
 
+.subscription {
+  margin-top: 10px;
+}
 .avatar {
   overflow: hidden;
   border-radius: 20px;

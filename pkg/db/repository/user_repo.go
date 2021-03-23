@@ -81,3 +81,15 @@ func (r *UserRepository) Get(id int) (*entity.User, error) {
 
 	return user, nil
 }
+
+func (r *UserRepository) Follow(userID, followingID int) error {
+	_, err := r.db.Exec(
+		`
+		INSERT INTO followers (user_id, following_id)
+		VALUES($1,$2)
+		`, userID, followingID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
