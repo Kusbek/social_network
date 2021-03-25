@@ -8,11 +8,13 @@ import (
 type Reader interface {
 	Find(nickmail string) (*entity.User, error)
 	Get(id int) (*entity.User, error)
+	IsFollowing(userID int, followingID int) (bool, error)
 }
 
 //Writer ...
 type Writer interface {
 	Follow(userID int, followingID int) error
+	Unfollow(userID int, followingID int) error
 	Create(user *entity.User) (entity.ID, error)
 }
 
@@ -28,4 +30,6 @@ type UseCase interface {
 	FindUser(nickmail string) (*entity.User, error)
 	GetUser(id int) (*entity.User, error)
 	Follow(userID, followingID int) error
+	Unfollow(userID, followingID int) error
+	IsFollowing(userID int, followingID int) (bool, error)
 }

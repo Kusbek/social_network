@@ -60,7 +60,6 @@ func (c *SessionRepository) Delete(uuid string) {
 
 func (c *SessionRepository) monitor() {
 	for {
-		// fmt.Println("cookie monitoring!!!")
 		time.Sleep(10 * time.Second)
 		for key, value := range c.sessions {
 

@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 
 	"git.01.alem.school/Kusbek/social-network/entity"
 )
@@ -74,7 +73,6 @@ func (r *UserRepository) Get(id int) (*entity.User, error) {
 		&birthDate,
 	)
 	user.BirthDate = entity.StringToTime(birthDate)
-	fmt.Println(user.BirthDate)
 	if err != nil {
 		return nil, err
 	}
@@ -92,4 +90,27 @@ func (r *UserRepository) Follow(userID, followingID int) error {
 		return err
 	}
 	return nil
+}
+
+func (r *UserRepository) Unfollow(userID, followingID int) error {
+	_, err := r.db.Exec(
+		`
+		DELETE FROM followers WHERE user_id=$1 AND following_id=$2
+		`, userID, followingID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *UserRepository) IsFollowing(userID, followingID int) (bool, error) {
+	var exists bool
+	err := r.db.QueryRow(
+		`
+		SELECT EXISTS(SELECT 1 FROM followers WHERE user_id=$1 AND following_id=$2)
+		`, userID, followingID).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
 }
