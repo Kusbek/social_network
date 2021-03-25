@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"git.01.alem.school/Kusbek/social-network/api/middleware"
 	"git.01.alem.school/Kusbek/social-network/api/presenter"
 	"git.01.alem.school/Kusbek/social-network/entity"
 	"git.01.alem.school/Kusbek/social-network/usecase/session"
@@ -201,81 +200,6 @@ func getUser(userService user.UseCase) http.HandlerFunc {
 	})
 }
 
-func follow(userService user.UseCase) http.HandlerFunc {
-	var input struct {
-		FollowingID int `json:"following_id"`
-	}
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
-			return
-		}
-		err := json.NewDecoder(r.Body).Decode(&input)
-		if err != nil {
-			errorResponse(w, http.StatusBadRequest, err)
-			return
-		}
-		err = userService.Follow(r.Context().Value(middleware.UserID).(int), input.FollowingID)
-		if err != nil {
-			errorResponse(w, http.StatusInternalServerError, err)
-			return
-		}
-
-		successResponse(w, http.StatusOK, map[string]interface{}{
-			"success": true,
-		})
-	})
-}
-
-func unfollow(userService user.UseCase) http.HandlerFunc {
-	var input struct {
-		FollowingID int `json:"following_id"`
-	}
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
-			return
-		}
-		err := json.NewDecoder(r.Body).Decode(&input)
-		if err != nil {
-			errorResponse(w, http.StatusBadRequest, err)
-			return
-		}
-		err = userService.Unfollow(r.Context().Value(middleware.UserID).(int), input.FollowingID)
-		if err != nil {
-			errorResponse(w, http.StatusInternalServerError, err)
-			return
-		}
-
-		successResponse(w, http.StatusOK, map[string]interface{}{
-			"success": true,
-		})
-	})
-}
-
-func isFollowing(userService user.UseCase) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
-			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
-			return
-		}
-		followingID, err := strconv.Atoi(r.URL.Query().Get("following_id"))
-		if err != nil {
-			errorResponse(w, http.StatusBadRequest, fmt.Errorf("following_id is a required parameter"))
-			return
-		}
-		isFollowing, err := userService.IsFollowing(r.Context().Value(middleware.UserID).(int), followingID)
-		if err != nil {
-			errorResponse(w, http.StatusInternalServerError, err)
-			return
-		}
-
-		successResponse(w, http.StatusOK, map[string]interface{}{
-			"is_following": isFollowing,
-		})
-	})
-}
-
 func deleteCookie(w http.ResponseWriter, sessionService session.UseCase, cookie *http.Cookie) {
 	sessionService.DeleteSession(cookie.Value)
 	cookie.Expires = time.Now().AddDate(0, 0, -1)
@@ -299,7 +223,4 @@ func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userServ
 	r.Handle("/api/auth", authenticate(sessionService))
 	r.Handle("/api/logout", logout(sessionService))
 	r.Handle("/api/user", getUser(userService))
-	r.Handle("/api/user/follow", middleware.Auth(sessionService, follow(userService)))
-	r.Handle("/api/user/unfollow", middleware.Auth(sessionService, unfollow(userService)))
-	r.Handle("/api/user/isfollowing", middleware.Auth(sessionService, isFollowing(userService)))
 }

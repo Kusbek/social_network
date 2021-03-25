@@ -13,7 +13,7 @@ const useSubscription = () => {
             following_id: followingId,
         }
         try {
-            let res = await fetch('./api/user/follow', {
+            let res = await fetch('./api/follow', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -36,7 +36,7 @@ const useSubscription = () => {
             following_id: followingId,
         }
         try {
-            let res = await fetch('./api/user/unfollow', {
+            let res = await fetch('./api/unfollow', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -56,7 +56,7 @@ const useSubscription = () => {
     
     const checkIfFollowing = async (followingId) => {
         try {
-            let res = await fetch(`./api/user/isfollowing?following_id=${followingId}`)
+            let res = await fetch(`./api/isfollowing?following_id=${followingId}`)
             if (!res.ok) {
                 throw Error("Failed to check if following")
             }

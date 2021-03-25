@@ -13,6 +13,7 @@ import (
 	"git.01.alem.school/Kusbek/social-network/pkg/db/repository"
 	"git.01.alem.school/Kusbek/social-network/pkg/db/sqlite"
 	"git.01.alem.school/Kusbek/social-network/usecase/session"
+	"git.01.alem.school/Kusbek/social-network/usecase/subscription"
 	"git.01.alem.school/Kusbek/social-network/usecase/user"
 )
 
@@ -36,10 +37,12 @@ func main() {
 
 	r := http.NewServeMux()
 	userService := newUser(db)
+	subscriptionService := newSubscription(db, userService)
 	sessionService := newSession()
 
 	handler.MakeFileHandlers(r)
 	handler.MakeUserHandlers(r, sessionService, userService)
+	handler.MakeSubscriptionHandlers(r, sessionService, subscriptionService)
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", apiPort),
 		Handler:        r,
@@ -82,4 +85,10 @@ func newUser(db *sql.DB) user.UseCase {
 	// }
 
 	return userService
+}
+
+func newSubscription(db *sql.DB, userService user.UseCase) subscription.UseCase {
+	repo := repository.NewSubscriptionRepository(db)
+	service := subscription.NewService(repo, userService)
+	return service
 }
