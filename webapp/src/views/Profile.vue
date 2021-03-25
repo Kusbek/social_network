@@ -38,7 +38,7 @@ export default {
     const { profile, error, load } = useProfile();
     load(props.id);
     const { getFollowers, followersList } = useSubscription();
-    getFollowers();
+    getFollowers(props.id);
 
     return {
       followersList,

@@ -70,33 +70,13 @@ const useSubscription = () => {
     }
     const getFollowers = async (profileId) => {
         try {
-            // let res = await fetch(`./api/user/followers`)
-            // if (!res.ok) {
-            //     throw Error("Failed to check of following")
-            // }
-            // let data = await res.json()
-            let data = {
-                followers_list: [{
-                        id: 1,
-                        first_name: "Bekarys",
-                        last_name: "Kuspan",
-                        path_to_photo: "/img/ninja.jpg",
-                    },
-                    {
-                        id: 2,
-                        first_name: "Scarlett",
-                        last_name: "Johanson",
-                        path_to_photo: "/img/ninja.jpg",
-                    },
-                    {
-                        id: 3,
-                        first_name: "Test",
-                        last_name: "User",
-                        path_to_photo: "/img/ninja.jpg",
-                    },
-                ]
+            let res = await fetch(`./api/followers?profile_id=${profileId}`)
+            if (!res.ok) {
+                throw Error("Failed to check of following")
             }
+            let data = await res.json()
             followersList.value = data.followers_list
+            console.log(followersList.value)
         } catch (e) {
             console.log(e.message)
             error.value = e.message

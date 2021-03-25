@@ -1,6 +1,9 @@
 package subscription
 
-import "git.01.alem.school/Kusbek/social-network/usecase/user"
+import (
+	"git.01.alem.school/Kusbek/social-network/entity"
+	"git.01.alem.school/Kusbek/social-network/usecase/user"
+)
 
 //Service ...
 type Service struct {
@@ -41,4 +44,9 @@ func (s *Service) Unfollow(userID, followingID int) error {
 		return err
 	}
 	return s.repo.Unfollow(userID, followingUser.ID)
+}
+
+//Follow ...
+func (s *Service) GetFollowers(profileID int) ([]*entity.User, error) {
+	return s.repo.GetFollowers(profileID)
 }

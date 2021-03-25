@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"git.01.alem.school/Kusbek/social-network/api/middleware"
+	"git.01.alem.school/Kusbek/social-network/api/presenter"
 	"git.01.alem.school/Kusbek/social-network/usecase/session"
 	"git.01.alem.school/Kusbek/social-network/usecase/subscription"
 )
@@ -89,9 +90,40 @@ func isFollowing(subscriptionService subscription.UseCase) http.HandlerFunc {
 		})
 	})
 }
+func getFollowers(subscriptionService subscription.UseCase) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
+			return
+		}
+		profileID, err := strconv.Atoi(r.URL.Query().Get("profile_id"))
+		if err != nil {
+			errorResponse(w, http.StatusBadRequest, fmt.Errorf("profile_id is a required parameter"))
+			return
+		}
+		followers, err := subscriptionService.GetFollowers(profileID)
+		if err != nil {
+			errorResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+		followersJSON := make([]*presenter.User, 0, len(followers))
+		for _, follower := range followers {
+			followersJSON = append(followersJSON, &presenter.User{
+				ID:        follower.ID,
+				FirstName: follower.FirstName,
+				LastName:  follower.LastName,
+			})
+		}
+
+		successResponse(w, http.StatusOK, map[string]interface{}{
+			"followers_list": followersJSON,
+		})
+	})
+}
 
 func MakeSubscriptionHandlers(r *http.ServeMux, sessionService session.UseCase, subscriptionService subscription.UseCase) {
 	r.Handle("/api/follow", middleware.Auth(sessionService, follow(subscriptionService)))
 	r.Handle("/api/unfollow", middleware.Auth(sessionService, unfollow(subscriptionService)))
 	r.Handle("/api/isfollowing", middleware.Auth(sessionService, isFollowing(subscriptionService)))
+	r.Handle("/api/followers", middleware.Auth(sessionService, getFollowers(subscriptionService)))
 }
