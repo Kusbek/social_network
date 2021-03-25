@@ -3,7 +3,9 @@ import {
 } from "@vue/reactivity"
 const profile = ref(null)
 const error = ref(null)
+
 const load = async (id) => {
+    error.value = null
     try {
         let res = await fetch(`./api/user?id=${id}`)
         let data = await res.json()
@@ -26,41 +28,14 @@ const load = async (id) => {
     // }
 }
 
-const follow = async (followingId) => {
-    let data = {
-        following_id: followingId,
-    }
-    try {
-        let res = await fetch('./api/user/follow', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
-        
-        if (!res.ok) {
-            throw Error("Failed to follow")
-        }
-        profile.value.isFollowing = true
-    } catch (e) {
-        console.log(e.message)
-        error.value = e.message
-    }
-}
 
-const unfollow = async () => {
-    console.log("unfollow")
-    // profile.value.isFollowing = false
-    console.log(profile.value)
-}
+
+
 
 const useProfile = () => {
     return {
         profile,
         error,
-        follow,
-        unfollow,
         load,
     }
 }

@@ -1,37 +1,34 @@
 <template>
-  <div class="subscription" v-if="profile.id !== user.id">
+  <div class="subscription">
     <button @click="handleSubscription">{{ subscriptionText }}</button>
   </div>
 </template>
 
 <script>
-import User from "../composables/user.js";
-import useProfile from "../composables/profile.js";
+import useSubscription from "../composables/subscription.js";
 import { computed } from "@vue/runtime-core";
 export default {
   props: ["profile"],
   setup(props) {
-    const { user, getUser } = User();
-    const { follow, unfollow } = useProfile();
-    getUser();
-
+    const { follow, unfollow, isFollowing, checkIfFollowing } = useSubscription();
+    checkIfFollowing(props.profile.id);
     const subscriptionText = computed(() => {
-      if (!props.profile.isFollowing) {
+      console.log(isFollowing)
+      if (!isFollowing.value) {
         return "Follow";
       }
       return "Unfollow";
     });
 
     const handleSubscription = async () => {
-      if (!props.profile.isFollowing) {
+      if (!isFollowing.value) {
         await follow(props.profile.id);
       } else {
-        await unfollow();
+        await unfollow(props.profile.id);
       }
     };
 
     return {
-      user,
       subscriptionText,
       handleSubscription,
     };

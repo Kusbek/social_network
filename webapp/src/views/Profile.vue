@@ -9,7 +9,7 @@
         <!-- <div class="subscription" v-if="profile.id !== user.id">
           <button @click="handleSubscription">{{ subscriptionText }}</button>
         </div> -->
-        <FollowButton :profile="profile"/>
+        <FollowButton v-if="profile.id !== user.id" :profile="profile" />
         <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
         <p class="info">username: {{ profile.username }}</p>
         <p class="info">email: {{ profile.email }}</p>
@@ -17,24 +17,32 @@
         <p class="info">About me: {{ profile.about_me }}</p>
       </div>
       <PostList />
+      <SubsList :title="'Followers'" :users="followersList" />
     </div>
   </div>
 </template>
 
 <script>
+import User from "../composables/user.js";
 import useProfile from "@/composables/profile.js";
 import PostList from "../components/PostList";
 import FollowButton from "../components/FollowButton";
-
-
+import SubsList from "../components/SubsList";
+import useSubscription from "../composables/subscription.js";
 export default {
   props: ["id"],
-  components: { PostList, FollowButton },
+  components: { PostList, FollowButton, SubsList },
   setup(props) {
-    const { profile, error, load} = useProfile();
+    const { user, getUser } = User();
+    getUser();
+    const { profile, error, load } = useProfile();
     load(props.id);
+    const { getFollowers, followersList } = useSubscription();
+    getFollowers();
 
     return {
+      followersList,
+      user,
       profile,
       error,
     };

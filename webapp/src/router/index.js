@@ -5,6 +5,7 @@ import Login from '../views/auth/Login.vue'
 import Signup from '../views/auth/Signup.vue'
 import MainPage from '../views/MainPage.vue'
 import Profile from '../views/Profile.vue'
+import Test from '../views/Test.vue'
 
 const requireNotAuth = async (to, from, next) => {
   const { user, getUser } = User()
@@ -51,6 +52,11 @@ const routes = [
     name: 'Signup',
     component: Signup,
     beforeEnter:requireNotAuth,
+  },
+  {
+    path: '/test',
+    name: 'Test',
+    component: Test,
   }
 ]
 
