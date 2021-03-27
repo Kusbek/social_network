@@ -62,7 +62,7 @@ func (r *UserRepository) Find(nickmail string) (*entity.User, error) {
 func (r *UserRepository) Get(id int) (*entity.User, error) {
 	user := &entity.User{}
 	var birthDate string
-	err := r.db.QueryRow(`SELECT id, username, email, first_name, last_name, about_me, path_to_photo, birth_date FROM users WHERE id=$1`, id).Scan(
+	err := r.db.QueryRow(`SELECT id, username, email, first_name, last_name, about_me, path_to_photo, birth_date, is_public FROM users WHERE id=$1`, id).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Email,
@@ -71,6 +71,7 @@ func (r *UserRepository) Get(id int) (*entity.User, error) {
 		&user.AboutMe,
 		&user.PathToPhoto,
 		&birthDate,
+		&user.IsPublic,
 	)
 	user.BirthDate = entity.StringToTime(birthDate)
 	if err != nil {
@@ -78,4 +79,17 @@ func (r *UserRepository) Get(id int) (*entity.User, error) {
 	}
 
 	return user, nil
+}
+
+func (r *UserRepository) ChangeVisibility(userID, isPublic int) (int, error) {
+
+	res, err := r.db.Exec(`UPDATE users SET is_public=$1 WHERE id=$2`, isPublic, userID)
+	if err != nil {
+		return 0, err
+	}
+	rowsAffected, err := res.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsAffected), nil
 }

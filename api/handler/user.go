@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"git.01.alem.school/Kusbek/social-network/api/middleware"
 	"git.01.alem.school/Kusbek/social-network/api/presenter"
 	"git.01.alem.school/Kusbek/social-network/entity"
 	"git.01.alem.school/Kusbek/social-network/usecase/session"
@@ -195,6 +196,7 @@ func getUser(userService user.UseCase) http.HandlerFunc {
 			AboutMe:     u.AboutMe,
 			PathToPhoto: u.PathToPhoto,
 			BirthDate:   entity.TimeToString(u.BirthDate),
+			IsPublic:    u.IsPublic,
 		}
 		successResponse(w, http.StatusOK, userJSON)
 	})
@@ -216,6 +218,38 @@ func setCookie(w http.ResponseWriter, service session.UseCase, user *entity.User
 	http.SetCookie(w, &cookie)
 }
 
+func setProfileVisibility(userService user.UseCase) http.HandlerFunc {
+	var input struct {
+		IsPublic bool `json:"is_public"`
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
+			return
+		}
+
+		err := json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			errorResponse(w, http.StatusBadRequest, err)
+			return
+		}
+
+		affectedRows, err := userService.ChangeVisibility(r.Context().Value(middleware.UserID).(int), input.IsPublic)
+		if err != nil {
+			if err == sql.ErrNoRows {
+				errorResponse(w, http.StatusNotFound, err)
+				return
+			}
+			errorResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		successResponse(w, http.StatusOK, map[string]interface{}{
+			"affected_rows": affectedRows,
+		})
+	})
+}
+
 //MakeUserHandlers ...
 func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userService user.UseCase) {
 	r.Handle("/api/signup", signup(sessionService, userService))
@@ -223,4 +257,5 @@ func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userServ
 	r.Handle("/api/auth", authenticate(sessionService))
 	r.Handle("/api/logout", logout(sessionService))
 	r.Handle("/api/user", getUser(userService))
+	r.Handle("/api/user/setprofilevisibility", middleware.Auth(sessionService, setProfileVisibility(userService)))
 }

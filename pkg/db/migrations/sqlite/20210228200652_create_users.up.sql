@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS users (
     birth_date TEXT,
     path_to_photo VARCHAR,
     about_me VARCHAR,
+    is_public BOOLEAN DEFAULT 1,
     password VARCHAR
 );

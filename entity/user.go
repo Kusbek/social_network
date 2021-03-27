@@ -19,6 +19,7 @@ type User struct {
 	AboutMe     string
 	PathToPhoto string
 	Password    string `validate:"min=5"`
+	IsPublic    bool
 }
 
 //NewUser ...
@@ -32,6 +33,7 @@ func NewUser(username, email, firstName, lastName, aboutMe, pathToPhoto, birthDa
 		AboutMe:     aboutMe,
 		PathToPhoto: pathToPhoto,
 		Password:    password,
+		IsPublic:    true,
 	}
 	user.EncryptPassword()
 	err := user.Validate()
@@ -71,5 +73,6 @@ func TestUser(username string, password string) *User {
 		BirthDate: StringToTime("1994-09-18"),
 		AboutMe:   "lorem ipsum vsyakaya hren liw by zapolnit eto pole",
 		Password:  password,
+		IsPublic:  true,
 	}
 }

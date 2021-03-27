@@ -12,4 +12,5 @@ type User struct {
 	BirthDate   string    `json:"birth_date,omitempty"`
 	AboutMe     string    `json:"about_me,omitempty"`
 	PathToPhoto string    `json:"path_to_photo,omitempty"`
+	IsPublic    bool      `json:"is_public"`
 }
