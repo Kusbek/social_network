@@ -8,7 +8,7 @@
     >
       <div class="subscription-item">
         <div class="avatar-container">
-          <img src="@/assets/ninja.jpg" />
+          <img :src="user.path_to_photo" />
         </div>
         <p>{{ user.first_name }} {{ user.last_name }}</p>
       </div>

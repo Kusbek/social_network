@@ -42,7 +42,7 @@ func (r *SubscriptionRepository) IsFollowing(userID, followingID int) (bool, err
 }
 
 func (r *SubscriptionRepository) GetFollowers(profileID int) ([]*entity.User, error) {
-	rows, err := r.db.Query(`SELECT id, first_name, last_name from users WHERE id IN (SELECT following_id from followers WHERE user_id=$1)`, profileID)
+	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT following_id from followers WHERE user_id=$1)`, profileID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,6 +54,7 @@ func (r *SubscriptionRepository) GetFollowers(profileID int) ([]*entity.User, er
 			&follower.ID,
 			&follower.FirstName,
 			&follower.LastName,
+			&follower.PathToPhoto,
 		)
 		if err != nil {
 			return nil, err
@@ -65,7 +66,7 @@ func (r *SubscriptionRepository) GetFollowers(profileID int) ([]*entity.User, er
 	return followers, nil
 }
 func (r *SubscriptionRepository) GetFollowingUsers(profileID int) ([]*entity.User, error) {
-	rows, err := r.db.Query(`SELECT id, first_name, last_name from users WHERE id IN (SELECT user_id from followers WHERE following_id=$1)`, profileID)
+	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT user_id from followers WHERE following_id=$1)`, profileID)
 	if err != nil {
 		return nil, err
 	}
@@ -77,6 +78,7 @@ func (r *SubscriptionRepository) GetFollowingUsers(profileID int) ([]*entity.Use
 			&followingUser.ID,
 			&followingUser.FirstName,
 			&followingUser.LastName,
+			&followingUser.PathToPhoto,
 		)
 		if err != nil {
 			return nil, err

@@ -109,9 +109,10 @@ func getFollowers(subscriptionService subscription.UseCase) http.HandlerFunc {
 		followersJSON := make([]*presenter.User, 0, len(followers))
 		for _, follower := range followers {
 			followersJSON = append(followersJSON, &presenter.User{
-				ID:        follower.ID,
-				FirstName: follower.FirstName,
-				LastName:  follower.LastName,
+				ID:          follower.ID,
+				FirstName:   follower.FirstName,
+				LastName:    follower.LastName,
+				PathToPhoto: follower.PathToPhoto,
 			})
 		}
 
@@ -140,9 +141,10 @@ func getFollowingUsers(subscriptionService subscription.UseCase) http.HandlerFun
 		followingUserJSON := make([]*presenter.User, 0, len(followingUsers))
 		for _, f := range followingUsers {
 			followingUserJSON = append(followingUserJSON, &presenter.User{
-				ID:        f.ID,
-				FirstName: f.FirstName,
-				LastName:  f.LastName,
+				ID:          f.ID,
+				FirstName:   f.FirstName,
+				LastName:    f.LastName,
+				PathToPhoto: f.PathToPhoto,
 			})
 		}
 
