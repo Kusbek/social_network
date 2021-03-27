@@ -7,6 +7,7 @@ import {
 const useSubscription = () => {
     const error = ref(null)
     const followersList = ref([])
+    const followingList = ref([])
     const isFollowing = ref(false)
     const follow = async (followingId) => {
         let data = {
@@ -82,14 +83,30 @@ const useSubscription = () => {
             error.value = e.message
         }
     }
+    const getFollowing = async (profileId) => {
+        try {
+            let res = await fetch(`./api/following?profile_id=${profileId}`)
+            if (!res.ok) {
+                throw Error("Failed to check of following")
+            }
+            let data = await res.json()
+            followingList.value = data.following_list
+            console.log(followingList.value)
+        } catch (e) {
+            console.log(e.message)
+            error.value = e.message
+        }
+    }
     return {
         error,
         followersList,
+        followingList,
         isFollowing,
         checkIfFollowing,
         follow,
         unfollow,
         getFollowers,
+        getFollowing,
     }
 }
 

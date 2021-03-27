@@ -64,3 +64,25 @@ func (r *SubscriptionRepository) GetFollowers(profileID int) ([]*entity.User, er
 
 	return followers, nil
 }
+func (r *SubscriptionRepository) GetFollowingUsers(profileID int) ([]*entity.User, error) {
+	rows, err := r.db.Query(`SELECT id, first_name, last_name from users WHERE id IN (SELECT user_id from followers WHERE following_id=$1)`, profileID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	followingUsers := make([]*entity.User, 0)
+	for rows.Next() {
+		followingUser := &entity.User{}
+		err = rows.Scan(
+			&followingUser.ID,
+			&followingUser.FirstName,
+			&followingUser.LastName,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		followingUsers = append(followingUsers, followingUser)
+	}
+	return followingUsers, nil
+}

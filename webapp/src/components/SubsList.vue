@@ -20,6 +20,9 @@
 <script>
 export default {
   props: ["title", "users"],
+  setup(props) {
+    console.log(props.users)
+  } 
 };
 </script>
 

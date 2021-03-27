@@ -121,9 +121,41 @@ func getFollowers(subscriptionService subscription.UseCase) http.HandlerFunc {
 	})
 }
 
+func getFollowingUsers(subscriptionService subscription.UseCase) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
+			return
+		}
+		profileID, err := strconv.Atoi(r.URL.Query().Get("profile_id"))
+		if err != nil {
+			errorResponse(w, http.StatusBadRequest, fmt.Errorf("profile_id is a required parameter"))
+			return
+		}
+		followingUsers, err := subscriptionService.GetFollowingUsers(profileID)
+		if err != nil {
+			errorResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+		followingUserJSON := make([]*presenter.User, 0, len(followingUsers))
+		for _, f := range followingUsers {
+			followingUserJSON = append(followingUserJSON, &presenter.User{
+				ID:        f.ID,
+				FirstName: f.FirstName,
+				LastName:  f.LastName,
+			})
+		}
+
+		successResponse(w, http.StatusOK, map[string]interface{}{
+			"following_list": followingUserJSON,
+		})
+	})
+}
+
 func MakeSubscriptionHandlers(r *http.ServeMux, sessionService session.UseCase, subscriptionService subscription.UseCase) {
 	r.Handle("/api/follow", middleware.Auth(sessionService, follow(subscriptionService)))
 	r.Handle("/api/unfollow", middleware.Auth(sessionService, unfollow(subscriptionService)))
 	r.Handle("/api/isfollowing", middleware.Auth(sessionService, isFollowing(subscriptionService)))
 	r.Handle("/api/followers", middleware.Auth(sessionService, getFollowers(subscriptionService)))
+	r.Handle("/api/following", middleware.Auth(sessionService, getFollowingUsers(subscriptionService)))
 }

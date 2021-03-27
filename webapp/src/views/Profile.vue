@@ -2,22 +2,27 @@
   <div>
     <div v-if="error" class="error">{{ error }}</div>
     <div v-if="profile" class="profile-details">
-      <div class="profile-info">
-        <div class="avatar">
-          <img :src="profile.path_to_photo" />
-        </div>
-        <!-- <div class="subscription" v-if="profile.id !== user.id">
+      <div class="info-box">
+        <div class="profile-info">
+          <div class="avatar">
+            <img :src="profile.path_to_photo" />
+          </div>
+          <!-- <div class="subscription" v-if="profile.id !== user.id">
           <button @click="handleSubscription">{{ subscriptionText }}</button>
         </div> -->
-        <FollowButton v-if="profile.id !== user.id" :profile="profile" />
-        <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
-        <p class="info">username: {{ profile.username }}</p>
-        <p class="info">email: {{ profile.email }}</p>
-        <p class="info">birth date: {{ profile.birth_date }}</p>
-        <p class="info">About me: {{ profile.about_me }}</p>
+          <FollowButton v-if="profile.id !== user.id" :profile="profile" />
+          <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
+          <p class="info">username: {{ profile.username }}</p>
+          <p class="info">email: {{ profile.email }}</p>
+          <p class="info">birth date: {{ profile.birth_date }}</p>
+          <p class="info">About me: {{ profile.about_me }}</p>
+        </div>
+        <SubsList :title="'Followers'" :users="followersList" />
+        <SubsList :title="'Following'" :users="followingList" />
       </div>
-      <PostList />
-      <SubsList :title="'Followers'" :users="followersList" />
+      <div class="post-box">
+        <PostList />
+      </div>
     </div>
   </div>
 </template>
@@ -37,11 +42,18 @@ export default {
     getUser();
     const { profile, error, load } = useProfile();
     load(props.id);
-    const { getFollowers, followersList } = useSubscription();
+    const {
+      getFollowers,
+      followersList,
+      getFollowing,
+      followingList,
+    } = useSubscription();
     getFollowers(props.id);
+    getFollowing(props.id);
 
     return {
       followersList,
+      followingList,
       user,
       profile,
       error,
@@ -54,7 +66,13 @@ export default {
 .profile-details {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: 80px;
+  column-gap: 80px;
+}
+
+.info-box {
+  display: grid;
+  grid-template-rows: 2fr 1fr 1fr;
+  row-gap: 40px;
 }
 .profile-info {
   text-align: center;

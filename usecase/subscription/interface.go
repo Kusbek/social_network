@@ -5,6 +5,7 @@ import "git.01.alem.school/Kusbek/social-network/entity"
 type Reader interface {
 	IsFollowing(userID int, followingID int) (bool, error)
 	GetFollowers(profileID int) ([]*entity.User, error)
+	GetFollowingUsers(profileID int) ([]*entity.User, error)
 }
 
 //Writer ...
@@ -24,4 +25,5 @@ type UseCase interface {
 	Unfollow(userID, followingID int) error
 	IsFollowing(userID int, followingID int) (bool, error)
 	GetFollowers(profileID int) ([]*entity.User, error)
+	GetFollowingUsers(profileID int) ([]*entity.User, error)
 }
