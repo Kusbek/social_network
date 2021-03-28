@@ -7,10 +7,8 @@
           <div class="avatar">
             <img :src="profile.path_to_photo" />
           </div>
-          <!-- <div class="subscription" v-if="profile.id !== user.id">
-          <button @click="handleSubscription">{{ subscriptionText }}</button>
-        </div> -->
           <FollowButton v-if="profile.id !== user.id" :profile="profile" />
+          
           <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
           <p class="info">username: {{ profile.username }}</p>
           <p class="info">email: {{ profile.email }}</p>
