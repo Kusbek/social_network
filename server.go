@@ -73,7 +73,7 @@ func newUser(db *sql.DB) user.UseCase {
 				"Bekarys",
 				"Kuspan",
 				"Something is important, but not this project",
-				"/img/images/avatars/2021-03-15 20.32.55.jpg",
+				"/img/avatars/2021-03-15 20.32.55.jpg",
 				"1994-09-18",
 				"123456")
 			if err != nil {

@@ -9,12 +9,15 @@ const load = async (id) => {
     try {
         let res = await fetch(`./api/user?id=${id}`)
         let data = await res.json()
+        if (!res.ok) {
+            throw Error("Could not fetch profile")
+        }
         profile.value = {
             ...data
         }
     } catch (e) {
         console.log(e.message)
-        error.value = "Could not fetch profile"
+        error.value = e.message
     }
     // profile.value = {
     //     id: id,
@@ -28,6 +31,24 @@ const load = async (id) => {
     // }
 }
 
+const setPublicity = async (isPublic) => {
+    error.value = null
+    let body = {
+        is_public: isPublic,
+    }
+    try {
+        let res = await fetch(`./api/user/setprofilevisibility`, {
+            method: "PATCH",
+            body: JSON.stringify(body)
+        })
+        if (!res.ok) {
+            throw Error("Could not update publicity")
+        }
+    } catch (e) {
+        console.log(e.message)
+        error.value = e.message
+    }
+}
 
 
 
@@ -36,6 +57,7 @@ const useProfile = () => {
     return {
         profile,
         error,
+        setPublicity,
         load,
     }
 }

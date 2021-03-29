@@ -8,12 +8,18 @@
             <img :src="profile.path_to_photo" />
           </div>
           <FollowButton v-if="profile.id !== user.id" :profile="profile" />
-          
+
           <h2>{{ profile.first_name }} {{ profile.last_name }}</h2>
           <p class="info">username: {{ profile.username }}</p>
           <p class="info">email: {{ profile.email }}</p>
           <p class="info">birth date: {{ profile.birth_date }}</p>
           <p class="info">About me: {{ profile.about_me }}</p>
+          <Switch
+            v-if="profile.id === user.id"
+            :state="profile.is_public"
+            :name="'Public account'"
+            @toggle="handleToggle"
+          />
         </div>
         <SubsList :title="'Followers'" :users="followersList" />
         <SubsList :title="'Following'" :users="followingList" />
@@ -31,14 +37,15 @@ import useProfile from "@/composables/profile.js";
 import PostList from "../components/PostList";
 import FollowButton from "../components/FollowButton";
 import SubsList from "../components/SubsList";
+import Switch from "../components/Switch";
 import useSubscription from "../composables/subscription.js";
 export default {
   props: ["id"],
-  components: { PostList, FollowButton, SubsList },
+  components: { PostList, FollowButton, SubsList, Switch },
   setup(props) {
     const { user, getUser } = User();
     getUser();
-    const { profile, error, load } = useProfile();
+    const { profile, error, load, setPublicity } = useProfile();
     load(props.id);
     const {
       getFollowers,
@@ -49,12 +56,21 @@ export default {
     getFollowers(props.id);
     getFollowing(props.id);
 
+    const handleToggle = async () => {
+      await setPublicity(!profile.value.is_public);
+      if (!error.value) {
+        profile.value.is_public = !profile.value.is_public;
+      }
+      console.log(profile.value.is_public);
+    };
+
     return {
       followersList,
       followingList,
       user,
       profile,
       error,
+      handleToggle,
     };
   },
 };

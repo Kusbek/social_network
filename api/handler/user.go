@@ -223,7 +223,7 @@ func setProfileVisibility(userService user.UseCase) http.HandlerFunc {
 		IsPublic bool `json:"is_public"`
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
+		if r.Method != "PATCH" {
 			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
 			return
 		}

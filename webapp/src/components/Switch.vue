@@ -1,13 +1,16 @@
 <template>
-  <div class="toggle" :class="stateClass" @click="onClick">
-    <div class="slider" :class="stateClass"></div>
+  <div class="switch-container">
+    <div>{{ name }}</div>
+    <div class="toggle" :class="stateClass" @click="onClick">
+      <div class="slider" :class="stateClass"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import { computed, ref } from "@vue/runtime-core";
 export default {
-  props: ["state"],
+  props: ["state", "name"],
   setup(props, context) {
     const stateClass = computed(() => {
       if (props.state) {
@@ -15,7 +18,7 @@ export default {
       }
     });
     const onClick = () => {
-      context.emit("toggle")
+      context.emit("toggle");
     };
 
     return {
@@ -27,14 +30,23 @@ export default {
 </script>
 
 <style scoped>
+.switch-container {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  max-width: 1200px;
+}
 .toggle {
-  width: 100px;
-  height: 50px;
+  width: 40px;
+  height: 20px;
   background: #fff;
   border: 2px solid #ddd;
   border-radius: 200px;
   padding: 2px;
   transition: background 0.6s;
+  margin-left: auto;
 }
 
 .toggle.active {
@@ -43,11 +55,11 @@ export default {
 }
 
 .slider {
-  width: 50px;
-  height: 50px;
+  width: 20px;
+  height: 20px;
   background: #ddd;
   border-radius: 100%;
-  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.6);
+  /* box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.6); */
   transform: translateX(0%);
   transition: transform 0.05s ease-in-out;
 }
