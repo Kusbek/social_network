@@ -76,6 +76,15 @@ func newUser(db *sql.DB) user.UseCase {
 				"/img/avatars/2021-03-15 20.32.55.jpg",
 				"1994-09-18",
 				"123456")
+			_, err = userService.CreateUser(
+				"scarlett",
+				"scarlett@gmail.com",
+				"Scarlett",
+				"Johanson",
+				"I'm a black widow and used to have big tits",
+				"/img/avatars/2cd43b_e0d52be694a24ce2ba7a0aeca9002e5e_mv2_d_1600_2532_s_2.png",
+				"1978-05-12",
+				"123456")
 			if err != nil {
 				log.Fatal(err)
 			}

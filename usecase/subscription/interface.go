@@ -11,6 +11,7 @@ type Reader interface {
 //Writer ...
 type Writer interface {
 	Follow(userID int, followingID int) error
+	RequestFollow(userID int, followingID int) error
 	Unfollow(userID int, followingID int) error
 }
 

@@ -24,6 +24,14 @@ func (r *SubscriptionRepository) Follow(userID, followingID int) error {
 	return nil
 }
 
+func (r *SubscriptionRepository) RequestFollow(userID, followingID int) error {
+	_, err := r.db.Exec(`INSERT INTO followers (user_id, following_id, is_requested) VALUES($1,$2, 1)`, userID, followingID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *SubscriptionRepository) Unfollow(userID, followingID int) error {
 	_, err := r.db.Exec(`DELETE FROM followers WHERE user_id=$1 AND following_id=$2`, userID, followingID)
 	if err != nil {
@@ -34,7 +42,7 @@ func (r *SubscriptionRepository) Unfollow(userID, followingID int) error {
 
 func (r *SubscriptionRepository) IsFollowing(userID, followingID int) (bool, error) {
 	var exists bool
-	err := r.db.QueryRow(`SELECT EXISTS(SELECT 1 FROM followers WHERE user_id=$1 AND following_id=$2)`, userID, followingID).Scan(&exists)
+	err := r.db.QueryRow(`SELECT EXISTS(SELECT 1 FROM followers WHERE user_id=$1 AND following_id=$2 AND is_requested=0)`, userID, followingID).Scan(&exists)
 	if err != nil {
 		return false, err
 	}
@@ -42,7 +50,7 @@ func (r *SubscriptionRepository) IsFollowing(userID, followingID int) (bool, err
 }
 
 func (r *SubscriptionRepository) GetFollowers(profileID int) ([]*entity.User, error) {
-	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT user_id from followers WHERE following_id=$1)`, profileID)
+	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT user_id from followers WHERE following_id=$1 AND is_requested=0)`, profileID)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +74,7 @@ func (r *SubscriptionRepository) GetFollowers(profileID int) ([]*entity.User, er
 	return followers, nil
 }
 func (r *SubscriptionRepository) GetFollowingUsers(profileID int) ([]*entity.User, error) {
-	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT following_id from followers WHERE user_id=$1)`, profileID)
+	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT following_id from followers WHERE user_id=$1 AND is_requested=0)`, profileID)
 	if err != nil {
 		return nil, err
 	}

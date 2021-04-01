@@ -22,6 +22,9 @@ func (s *Service) Follow(userID, followingID int) error {
 	if err != nil {
 		return err
 	}
+	if !followingUser.IsPublic {
+		return s.repo.RequestFollow(userID, followingUser.ID)
+	}
 	return s.repo.Follow(userID, followingUser.ID)
 }
 
