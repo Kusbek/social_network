@@ -41,7 +41,7 @@ func main() {
 	sessionService := newSession()
 
 	handler.MakeFileHandlers(r)
-	handler.MakeUserHandlers(r, sessionService, userService)
+	handler.MakeUserHandlers(r, sessionService, userService, subscriptionService)
 	handler.MakeSubscriptionHandlers(r, sessionService, subscriptionService)
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", apiPort),

@@ -12,6 +12,7 @@ import (
 	"git.01.alem.school/Kusbek/social-network/api/presenter"
 	"git.01.alem.school/Kusbek/social-network/entity"
 	"git.01.alem.school/Kusbek/social-network/usecase/session"
+	"git.01.alem.school/Kusbek/social-network/usecase/subscription"
 	"git.01.alem.school/Kusbek/social-network/usecase/user"
 )
 
@@ -165,20 +166,22 @@ func logout(sessionService session.UseCase) http.HandlerFunc {
 	})
 }
 
-func getUser(userService user.UseCase) http.HandlerFunc {
+func getUser(userService user.UseCase, subService subscription.UseCase) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
 			return
 		}
 
-		id, err := strconv.Atoi(r.URL.Query().Get("id"))
+		userID := r.Context().Value(middleware.UserID).(int)
+
+		profileID, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil {
 			errorResponse(w, http.StatusBadRequest, fmt.Errorf("id is a required parameter"))
 			return
 		}
 
-		u, err := userService.GetUser(id)
+		u, err := userService.GetUser(profileID)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				errorResponse(w, http.StatusNotFound, err)
@@ -187,6 +190,23 @@ func getUser(userService user.UseCase) http.HandlerFunc {
 			errorResponse(w, http.StatusInternalServerError, err)
 			return
 		}
+
+		if !u.IsPublic && userID != profileID {
+			isFollowing, err := subService.IsFollowing(userID, profileID)
+			if err != nil {
+				errorResponse(w, http.StatusInternalServerError, err)
+				return
+			}
+
+			if !isFollowing {
+				userJSON := &presenter.User{
+					IsPublic: u.IsPublic,
+				}
+				successResponse(w, http.StatusOK, userJSON)
+				return
+			}
+		}
+
 		userJSON := &presenter.User{
 			ID:          u.ID,
 			Username:    u.Username,
@@ -251,11 +271,11 @@ func setProfileVisibility(userService user.UseCase) http.HandlerFunc {
 }
 
 //MakeUserHandlers ...
-func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userService user.UseCase) {
+func MakeUserHandlers(r *http.ServeMux, sessionService session.UseCase, userService user.UseCase, subService subscription.UseCase) {
 	r.Handle("/api/signup", signup(sessionService, userService))
 	r.Handle("/api/login", login(sessionService, userService))
 	r.Handle("/api/auth", authenticate(sessionService))
 	r.Handle("/api/logout", logout(sessionService))
-	r.Handle("/api/user", getUser(userService))
+	r.Handle("/api/user", middleware.Auth(sessionService, getUser(userService, subService)))
 	r.Handle("/api/user/setprofilevisibility", middleware.Auth(sessionService, setProfileVisibility(userService)))
 }

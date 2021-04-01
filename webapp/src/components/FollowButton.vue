@@ -8,12 +8,11 @@
 import useSubscription from "../composables/subscription.js";
 import { computed } from "@vue/runtime-core";
 export default {
-  props: ["profile"],
+  props: ["id"],
   setup(props) {
     const { follow, unfollow, isFollowing, checkIfFollowing } = useSubscription();
-    checkIfFollowing(props.profile.id);
+    checkIfFollowing(props.id);
     const subscriptionText = computed(() => {
-      console.log(isFollowing)
       if (!isFollowing.value) {
         return "Follow";
       }
@@ -22,9 +21,9 @@ export default {
 
     const handleSubscription = async () => {
       if (!isFollowing.value) {
-        await follow(props.profile.id);
+        await follow(props.id);
       } else {
-        await unfollow(props.profile.id);
+        await unfollow(props.id);
       }
     };
 

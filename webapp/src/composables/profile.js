@@ -8,10 +8,10 @@ const load = async (id) => {
     error.value = null
     try {
         let res = await fetch(`./api/user?id=${id}`)
-        let data = await res.json()
         if (!res.ok) {
             throw Error("Could not fetch profile")
         }
+        let data = await res.json()
         profile.value = {
             ...data
         }

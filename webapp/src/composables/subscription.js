@@ -11,7 +11,7 @@ const useSubscription = () => {
     const isFollowing = ref(false)
     const follow = async (followingId) => {
         let data = {
-            following_id: followingId,
+            following_id: parseInt(followingId),
         }
         try {
             let res = await fetch('./api/follow', {
@@ -34,7 +34,7 @@ const useSubscription = () => {
     
     const unfollow = async (followingId) => {
         let data = {
-            following_id: followingId,
+            following_id: parseInt(followingId),
         }
         try {
             let res = await fetch('./api/unfollow', {
@@ -62,7 +62,6 @@ const useSubscription = () => {
                 throw Error("Failed to check if following")
             }
             let data = await res.json()
-            console.log(data)
             isFollowing.value = data.is_following
         } catch (e) {
             console.log(e.message)
@@ -77,7 +76,6 @@ const useSubscription = () => {
             }
             let data = await res.json()
             followersList.value = data.followers_list
-            console.log(followersList.value)
         } catch (e) {
             console.log(e.message)
             error.value = e.message
@@ -91,7 +89,6 @@ const useSubscription = () => {
             }
             let data = await res.json()
             followingList.value = data.following_list
-            console.log(followingList.value)
         } catch (e) {
             console.log(e.message)
             error.value = e.message
