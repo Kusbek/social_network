@@ -13,7 +13,6 @@
         <p>{{ user.first_name }} {{ user.last_name }}</p>
       </div>
     </router-link>
-    <router-view :key="$route.fullPath"></router-view>
   </div>
 </template>
 
@@ -36,20 +35,20 @@ export default {
   margin-bottom: 5px;
 }
 
-.avatar-container {
+/* .avatar-container {
   overflow: hidden;
   height: 20px;
   width: 20px;
   margin-left: 5px;
   margin-right: 5px;
-}
+} */
 
-.avatar-container img {
+/* .avatar-container img {
   top: 0;
   left: 0;
   min-width: 100%;
   min-height: 100%;
   max-width: 100%;
   max-height: 100%;
-}
+} */
 </style>

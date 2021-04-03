@@ -19,7 +19,7 @@
           @toggle="handleToggle"
         />
       </div>
-
+      <SubsReqList v-if="self" />
       <SubsList :title="'Followers'" :users="followersList" />
       <SubsList :title="'Following'" :users="followingList" />
     </div>
@@ -30,14 +30,15 @@
 import FollowButton from "@/components/FollowButton";
 import Switch from "@/components/Switch";
 import SubsList from "@/components/SubsList";
+import SubsReqList from "@/components/SubsReqList";
 import useSubscription from "@/composables/subscription.js";
 import useProfile from "@/composables/profile.js";
 
 export default {
-  components: { FollowButton, Switch, SubsList},
+  components: { FollowButton, Switch, SubsList, SubsReqList },
   props: ["self", "profile"],
   setup(props) {
-    const {error, setPublicity } = useProfile();
+    const { error, setPublicity } = useProfile();
     const {
       getFollowers,
       followersList,
@@ -50,7 +51,7 @@ export default {
     const handleToggle = async () => {
       await setPublicity(!props.profile.is_public);
       if (!error.value) {
-        props.profile.is_public = ! props.profile.is_public;
+        props.profile.is_public = !props.profile.is_public;
       }
     };
 

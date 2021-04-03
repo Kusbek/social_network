@@ -78,3 +78,20 @@ textarea {
     font-size: 14px;
     margin: 16px 0;
 }
+
+.avatar-container {
+    overflow: hidden;
+    height: 20px;
+    width: 20px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.avatar-container img {
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
