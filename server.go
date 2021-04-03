@@ -50,7 +50,7 @@ func main() {
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	s.ListenAndServe()
+	log.Fatal(s.ListenAndServe())
 }
 
 func newSession() session.UseCase {

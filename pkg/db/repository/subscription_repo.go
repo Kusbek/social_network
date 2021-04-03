@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"git.01.alem.school/Kusbek/social-network/entity"
 )
@@ -29,6 +30,15 @@ func (r *SubscriptionRepository) RequestFollow(userID, followingID int) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *SubscriptionRepository) AcceptFollowRequest(userID, followerID int) error {
+	_, err := r.db.Exec(`UPDATE followers SET is_requested=0 WHERE user_id=$1 AND following_id=$2`, followerID, userID)
+	if err != nil {
+		return err
+	}
+	fmt.Println(userID, followerID)
 	return nil
 }
 
@@ -73,6 +83,32 @@ func (r *SubscriptionRepository) GetFollowers(profileID int) ([]*entity.User, er
 
 	return followers, nil
 }
+
+func (r *SubscriptionRepository) GetFollowRequests(profileID int) ([]*entity.User, error) {
+	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT user_id from followers WHERE following_id=$1 AND is_requested=1)`, profileID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	followers := make([]*entity.User, 0)
+	for rows.Next() {
+		follower := &entity.User{}
+		err = rows.Scan(
+			&follower.ID,
+			&follower.FirstName,
+			&follower.LastName,
+			&follower.PathToPhoto,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		followers = append(followers, follower)
+	}
+
+	return followers, nil
+}
+
 func (r *SubscriptionRepository) GetFollowingUsers(profileID int) ([]*entity.User, error) {
 	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT following_id from followers WHERE user_id=$1 AND is_requested=0)`, profileID)
 	if err != nil {

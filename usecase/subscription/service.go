@@ -28,6 +28,15 @@ func (s *Service) Follow(userID, followingID int) error {
 	return s.repo.Follow(userID, followingUser.ID)
 }
 
+func (s *Service) AcceptFollowRequest(userID, followerID int) error {
+	followerUser, err := s.userService.GetUser(followerID)
+	if err != nil {
+		return err
+	}
+
+	return s.repo.AcceptFollowRequest(userID, followerUser.ID)
+}
+
 func (s *Service) IsFollowing(userID, followingID int) (bool, error) {
 	followingUser, err := s.userService.GetUser(followingID)
 	if err != nil {
@@ -46,6 +55,10 @@ func (s *Service) Unfollow(userID, followingID int) error {
 
 func (s *Service) GetFollowers(profileID int) ([]*entity.User, error) {
 	return s.repo.GetFollowers(profileID)
+}
+
+func (s *Service) GetFollowRequests(profileID int) ([]*entity.User, error) {
+	return s.repo.GetFollowRequests(profileID)
 }
 
 func (s *Service) GetFollowingUsers(profileID int) ([]*entity.User, error) {

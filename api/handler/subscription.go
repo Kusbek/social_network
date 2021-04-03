@@ -30,6 +30,10 @@ func follow(subscriptionService subscription.UseCase) http.HandlerFunc {
 			errorResponse(w, http.StatusBadRequest, err)
 			return
 		}
+		if r.Context().Value(middleware.UserID).(int) == input.FollowingID {
+			errorResponse(w, http.StatusBadRequest, err)
+			return
+		}
 		err = subscriptionService.Follow(r.Context().Value(middleware.UserID).(int), input.FollowingID)
 		if err != nil {
 			errorResponse(w, http.StatusInternalServerError, err)
@@ -53,6 +57,10 @@ func unfollow(subscriptionService subscription.UseCase) http.HandlerFunc {
 		}
 		err := json.NewDecoder(r.Body).Decode(&input)
 		if err != nil {
+			errorResponse(w, http.StatusBadRequest, err)
+			return
+		}
+		if r.Context().Value(middleware.UserID).(int) == input.FollowingID {
 			errorResponse(w, http.StatusBadRequest, err)
 			return
 		}
@@ -154,10 +162,70 @@ func getFollowingUsers(subscriptionService subscription.UseCase) http.HandlerFun
 	})
 }
 
+func acceptFollowRequest(subscriptionService subscription.UseCase) http.HandlerFunc {
+	var input struct {
+		FollowerID int `json:"follower_id"`
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
+			return
+		}
+		err := json.NewDecoder(r.Body).Decode(&input)
+		if err != nil {
+			errorResponse(w, http.StatusBadRequest, err)
+			return
+		}
+		err = subscriptionService.AcceptFollowRequest(r.Context().Value(middleware.UserID).(int), input.FollowerID)
+		if err != nil {
+			errorResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+
+		successResponse(w, http.StatusOK, map[string]interface{}{
+			"success": true,
+		})
+	})
+}
+
+func getFollowRequests(subscriptionService subscription.UseCase) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
+			return
+		}
+		profileID, err := strconv.Atoi(r.URL.Query().Get("profile_id"))
+		if err != nil {
+			errorResponse(w, http.StatusBadRequest, fmt.Errorf("profile_id is a required parameter"))
+			return
+		}
+		followRequests, err := subscriptionService.GetFollowRequests(profileID)
+		if err != nil {
+			errorResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+		followRequestsJSON := make([]*presenter.User, 0, len(followRequests))
+		for _, f := range followRequests {
+			followRequestsJSON = append(followRequestsJSON, &presenter.User{
+				ID:          f.ID,
+				FirstName:   f.FirstName,
+				LastName:    f.LastName,
+				PathToPhoto: f.PathToPhoto,
+			})
+		}
+
+		successResponse(w, http.StatusOK, map[string]interface{}{
+			"following_list": followRequestsJSON,
+		})
+	})
+}
+
 func MakeSubscriptionHandlers(r *http.ServeMux, sessionService session.UseCase, subscriptionService subscription.UseCase) {
 	r.Handle("/api/follow", middleware.Auth(sessionService, follow(subscriptionService)))
 	r.Handle("/api/unfollow", middleware.Auth(sessionService, unfollow(subscriptionService)))
 	r.Handle("/api/isfollowing", middleware.Auth(sessionService, isFollowing(subscriptionService)))
 	r.Handle("/api/followers", middleware.Auth(sessionService, getFollowers(subscriptionService)))
 	r.Handle("/api/following", middleware.Auth(sessionService, getFollowingUsers(subscriptionService)))
+	r.Handle("/api/acceptfollow", middleware.Auth(sessionService, acceptFollowRequest(subscriptionService)))
+	r.Handle("/api/followrequests", middleware.Auth(sessionService, getFollowRequests(subscriptionService)))
 }
