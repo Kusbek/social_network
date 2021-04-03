@@ -194,12 +194,7 @@ func getFollowRequests(subscriptionService subscription.UseCase) http.HandlerFun
 			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
 			return
 		}
-		profileID, err := strconv.Atoi(r.URL.Query().Get("profile_id"))
-		if err != nil {
-			errorResponse(w, http.StatusBadRequest, fmt.Errorf("profile_id is a required parameter"))
-			return
-		}
-		followRequests, err := subscriptionService.GetFollowRequests(profileID)
+		followRequests, err := subscriptionService.GetFollowRequests(r.Context().Value(middleware.UserID).(int))
 		if err != nil {
 			errorResponse(w, http.StatusInternalServerError, err)
 			return
@@ -215,7 +210,7 @@ func getFollowRequests(subscriptionService subscription.UseCase) http.HandlerFun
 		}
 
 		successResponse(w, http.StatusOK, map[string]interface{}{
-			"following_list": followRequestsJSON,
+			"follow_request_list": followRequestsJSON,
 		})
 	})
 }
