@@ -12,6 +12,7 @@ import (
 	"git.01.alem.school/Kusbek/social-network/api/handler"
 	"git.01.alem.school/Kusbek/social-network/pkg/db/repository"
 	"git.01.alem.school/Kusbek/social-network/pkg/db/sqlite"
+	"git.01.alem.school/Kusbek/social-network/usecase/group"
 	"git.01.alem.school/Kusbek/social-network/usecase/session"
 	"git.01.alem.school/Kusbek/social-network/usecase/subscription"
 	"git.01.alem.school/Kusbek/social-network/usecase/user"
@@ -39,6 +40,7 @@ func main() {
 	userService := newUser(db)
 	subscriptionService := newSubscription(db, userService)
 	sessionService := newSession()
+	newGroup(db)
 
 	handler.MakeFileHandlers(r)
 	handler.MakeUserHandlers(r, sessionService, userService, subscriptionService)
@@ -99,5 +101,29 @@ func newUser(db *sql.DB) user.UseCase {
 func newSubscription(db *sql.DB, userService user.UseCase) subscription.UseCase {
 	repo := repository.NewSubscriptionRepository(db)
 	service := subscription.NewService(repo, userService)
+	return service
+}
+
+func newGroup(db *sql.DB) group.UseCase {
+	repo := repository.NewGroupRepository(db)
+	service := group.NewService(repo)
+	_, err := service.GetGroup(1)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			g, err := service.CreateGroup(1, "Test Group Title", "Test Group Description")
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Println(g)
+			gg, err := service.GetGroups()
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(gg)
+		} else {
+			log.Fatal(err)
+		}
+	}
 	return service
 }
