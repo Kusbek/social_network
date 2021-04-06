@@ -40,11 +40,12 @@ func main() {
 	userService := newUser(db)
 	subscriptionService := newSubscription(db, userService)
 	sessionService := newSession()
-	newGroup(db)
+	groupService := newGroup(db)
 
 	handler.MakeFileHandlers(r)
 	handler.MakeUserHandlers(r, sessionService, userService, subscriptionService)
 	handler.MakeSubscriptionHandlers(r, sessionService, subscriptionService)
+	handler.MakeGroupHandlers(r, sessionService, groupService)
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", apiPort),
 		Handler:        r,
@@ -78,6 +79,9 @@ func newUser(db *sql.DB) user.UseCase {
 				"/img/avatars/2021-03-15 20.32.55.jpg",
 				"1994-09-18",
 				"123456")
+			if err != nil {
+				log.Fatal(err)
+			}
 			_, err = userService.CreateUser(
 				"scarlett",
 				"scarlett@gmail.com",
