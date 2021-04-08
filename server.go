@@ -45,7 +45,7 @@ func main() {
 	handler.MakeFileHandlers(r)
 	handler.MakeUserHandlers(r, sessionService, userService, subscriptionService)
 	handler.MakeSubscriptionHandlers(r, sessionService, subscriptionService)
-	handler.MakeGroupHandlers(r, sessionService, groupService)
+	handler.MakeGroupHandlers(r, sessionService, groupService, userService)
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", apiPort),
 		Handler:        r,

@@ -8,8 +8,10 @@ import (
 
 	"git.01.alem.school/Kusbek/social-network/api/middleware"
 	"git.01.alem.school/Kusbek/social-network/api/presenter"
+	"git.01.alem.school/Kusbek/social-network/entity"
 	"git.01.alem.school/Kusbek/social-network/usecase/group"
 	"git.01.alem.school/Kusbek/social-network/usecase/session"
+	"git.01.alem.school/Kusbek/social-network/usecase/user"
 )
 
 func createGroup(w http.ResponseWriter, r *http.Request, groupService group.UseCase) {
@@ -54,7 +56,6 @@ func getGroups(groupService group.UseCase) http.HandlerFunc {
 		for _, group := range groups {
 			groupsJSON = append(groupsJSON, &presenter.Group{
 				ID:          group.ID,
-				OwnerID:     group.OwnerID,
 				Title:       group.Title,
 				Description: group.Description,
 			})
@@ -66,7 +67,7 @@ func getGroups(groupService group.UseCase) http.HandlerFunc {
 	})
 }
 
-func getGroup(w http.ResponseWriter, r *http.Request, groupService group.UseCase) {
+func getGroup(w http.ResponseWriter, r *http.Request, groupService group.UseCase, userService user.UseCase) {
 	groupID, err := strconv.Atoi(r.URL.Query().Get("group_id"))
 	if err != nil {
 		errorResponse(w, http.StatusBadRequest, fmt.Errorf("group_id is a required parameter"))
@@ -78,20 +79,33 @@ func getGroup(w http.ResponseWriter, r *http.Request, groupService group.UseCase
 		errorResponse(w, http.StatusInternalServerError, err)
 		return
 	}
-	fmt.Println(group)
+	owner, err := userService.GetUser(group.OwnerID)
+	if err != nil {
+		errorResponse(w, http.StatusInternalServerError, err)
+		return
+	}
 	successResponse(w, http.StatusOK, &presenter.Group{
-		ID:          group.ID,
-		OwnerID:     group.OwnerID,
+		ID: group.ID,
+		Owner: &presenter.User{
+			ID:          owner.ID,
+			Username:    owner.Username,
+			Email:       owner.Email,
+			FirstName:   owner.FirstName,
+			LastName:    owner.LastName,
+			AboutMe:     owner.AboutMe,
+			PathToPhoto: owner.PathToPhoto,
+			BirthDate:   entity.TimeToString(owner.BirthDate),
+		},
 		Title:       group.Title,
 		Description: group.Description,
 	})
 }
 
-func groupHandlers(groupService group.UseCase) http.HandlerFunc {
+func groupHandlers(groupService group.UseCase, userService user.UseCase) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			getGroup(w, r, groupService)
+			getGroup(w, r, groupService, userService)
 		case "POST":
 			createGroup(w, r, groupService)
 		default:
@@ -100,7 +114,7 @@ func groupHandlers(groupService group.UseCase) http.HandlerFunc {
 	})
 }
 
-func MakeGroupHandlers(r *http.ServeMux, sessionService session.UseCase, groupService group.UseCase) {
-	r.Handle("/api/group", middleware.Auth(sessionService, groupHandlers(groupService)))
+func MakeGroupHandlers(r *http.ServeMux, sessionService session.UseCase, groupService group.UseCase, userService user.UseCase) {
+	r.Handle("/api/group", middleware.Auth(sessionService, groupHandlers(groupService, userService)))
 	r.Handle("/api/groups", getGroups(groupService))
 }

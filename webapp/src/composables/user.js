@@ -8,7 +8,8 @@ const user = ref(null)
 
 const getUser = async () => {
     if (!user.value) {
-        await fetch("./api/auth").then(res => {
+        error.value = null
+        await fetch("/api/auth").then(res => {
             if (!res.ok || res.status == 401) {
                 throw Error("Failed to authenticate")
             }

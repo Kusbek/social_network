@@ -58,7 +58,7 @@ export default {
 <style>
 .profile-details {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr 3fr;
   column-gap: 80px;
 }
 

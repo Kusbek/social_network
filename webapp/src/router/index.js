@@ -5,6 +5,7 @@ import Login from '../views/auth/Login.vue'
 import Signup from '../views/auth/Signup.vue'
 import MainPage from '../views/MainPage.vue'
 import Profile from '../views/Profile.vue'
+import Group from '../views/Group.vue'
 import Test from '../views/Test.vue'
 
 const requireNotAuth = async (to, from, next) => {
@@ -32,6 +33,13 @@ const routes = [
     path: '/:id',
     name: 'Profile',
     component: Profile,
+    props: true,
+    beforeEnter:requireAuth,
+  },
+  {
+    path: '/group/:id',
+    name: 'Group',
+    component: Group,
     props: true,
     beforeEnter:requireAuth,
   },
