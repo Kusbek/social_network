@@ -16,7 +16,7 @@ const useSubscription = () => {
             following_id: parseInt(followingId),
         }
         try {
-            let res = await fetch('./api/follow', {
+            let res = await fetch('/api/follow', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -40,7 +40,7 @@ const useSubscription = () => {
             following_id: parseInt(followingId),
         }
         try {
-            let res = await fetch('./api/unfollow', {
+            let res = await fetch('/api/unfollow', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -61,7 +61,7 @@ const useSubscription = () => {
     const checkIfFollowing = async (followingId) => {
         error.value = null
         try {
-            let res = await fetch(`./api/isfollowing?following_id=${followingId}`)
+            let res = await fetch(`/api/isfollowing?following_id=${followingId}`)
             if (!res.ok) {
                 throw Error("Failed to check if following")
             }
@@ -75,7 +75,7 @@ const useSubscription = () => {
     const getFollowers = async (profileId) => {
         error.value = null
         try {
-            let res = await fetch(`./api/followers?profile_id=${profileId}`)
+            let res = await fetch(`/api/followers?profile_id=${profileId}`)
             if (!res.ok) {
                 throw Error("Failed to check of following")
             }
@@ -89,7 +89,7 @@ const useSubscription = () => {
     const getFollowing = async (profileId) => {
         error.value = null
         try {
-            let res = await fetch(`./api/following?profile_id=${profileId}`)
+            let res = await fetch(`/api/following?profile_id=${profileId}`)
             if (!res.ok) {
                 throw Error("Failed to check of following")
             }
@@ -107,7 +107,7 @@ const useSubscription = () => {
             follower_id: parseInt(followerId),
         }
         try {
-            let res = await fetch('./api/acceptfollow', {
+            let res = await fetch('/api/acceptfollow', {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"

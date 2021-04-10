@@ -5,7 +5,9 @@ import Login from '../views/auth/Login.vue'
 import Signup from '../views/auth/Signup.vue'
 import MainPage from '../views/MainPage.vue'
 import Profile from '../views/Profile.vue'
-import Group from '../views/Group.vue'
+import Group from '../views/group/Group.vue'
+import Groups from '../views/group/Groups.vue'
+import CreateGroupForm from '../views/group/CreateGroupForm.vue'
 import Test from '../views/Test.vue'
 
 const requireNotAuth = async (to, from, next) => {
@@ -44,6 +46,11 @@ const routes = [
     beforeEnter:requireAuth,
   },
   {
+    path: '/groups',
+    name: 'Groups',
+    component: Groups,
+  },
+  {
     path: '/',
     name: 'MainPage',
     component: MainPage,
@@ -60,6 +67,12 @@ const routes = [
     name: 'Signup',
     component: Signup,
     beforeEnter:requireNotAuth,
+  },
+  {
+    path: '/creategroup',
+    name: 'CreateGroupForm',
+    component: CreateGroupForm,
+    beforeEnter:requireAuth,
   },
   {
     path: '/test',

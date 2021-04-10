@@ -7,7 +7,7 @@ const error = ref(null)
 const load = async (id) => {
     error.value = null
     try {
-        let res = await fetch(`./api/user?id=${id}`)
+        let res = await fetch(`/api/user?id=${id}`)
         if (!res.ok) {
             throw Error("Could not fetch profile")
         }

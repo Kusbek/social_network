@@ -9,7 +9,7 @@ const upload = async (file) => {
         const formData = new FormData()
         formData.append('myFile', file)
         try {
-            let res = await fetch('./api/upload', {
+            let res = await fetch('/api/upload', {
                 method: "POST",
                 body: formData
             })

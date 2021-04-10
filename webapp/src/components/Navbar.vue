@@ -2,11 +2,14 @@
   <div class="navbar">
     <nav>
       <img src="@/assets/ninja.jpg" alt="" />
-      <h1><router-link :to="{ name: 'MainPage' }">Social Network</router-link></h1>
+      <h1>
+        <router-link :to="{ name: 'MainPage' }">Social Network</router-link>
+      </h1>
       <div class="links">
         <div v-if="user">
           <!-- <router-link :to="{ name: 'CreatePlaylist' }">Create Playlist</router-link>
           <router-link :to="{ name: 'UserPlaylists' }">My Playlists</router-link> -->
+          <router-link class="btn" :to="{ name: 'CreateGroupForm' }">New Group</router-link>
           <span>Hi there, {{ user.username }}</span>
           <button @click="handleClick">Logout</button>
         </div>
@@ -21,7 +24,6 @@
   </div>
 </template>
 <script>
-import { ref } from "@vue/reactivity";
 import User from "../composables/user";
 import { useRouter } from "vue-router";
 export default {
@@ -32,7 +34,7 @@ export default {
 
     const handleClick = async () => {
       await logout();
-      router.push({name: "Login"})
+      router.push({ name: "Login" });
     };
     return { user, handleClick };
   },

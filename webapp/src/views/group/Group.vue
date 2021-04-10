@@ -14,10 +14,10 @@
 
 <script>
 import { ref } from "@vue/reactivity";
-import GroupInfo from "../components/GroupInfo";
-import PostList from "../components/PostList";
-import SubsList from "../components/SubsList";
-import useGroup from "../composables/group.js";
+import GroupInfo from "../../components/GroupInfo";
+import PostList from "../../components/PostList";
+import SubsList from "../../components/SubsList";
+import useGroup from "../../composables/group.js";
 
 export default {
   props: ["id"],

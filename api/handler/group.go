@@ -36,11 +36,13 @@ func createGroup(w http.ResponseWriter, r *http.Request, groupService group.UseC
 		errorResponse(w, http.StatusInternalServerError, err)
 	}
 
-	successResponse(w, http.StatusOK, group)
+	successResponse(w, http.StatusOK, &presenter.Group{
+		ID: group.ID,
+	})
 
 }
 
-func getGroups(groupService group.UseCase) http.HandlerFunc {
+func getGroups(groupService group.UseCase, userService user.UseCase) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
@@ -54,8 +56,23 @@ func getGroups(groupService group.UseCase) http.HandlerFunc {
 		}
 		groupsJSON := make([]*presenter.Group, 0, len(groups))
 		for _, group := range groups {
+			owner, err := userService.GetUser(group.OwnerID)
+			if err != nil {
+				errorResponse(w, http.StatusInternalServerError, err)
+				return
+			}
 			groupsJSON = append(groupsJSON, &presenter.Group{
-				ID:          group.ID,
+				ID: group.ID,
+				Owner: &presenter.User{
+					ID:          owner.ID,
+					Username:    owner.Username,
+					Email:       owner.Email,
+					FirstName:   owner.FirstName,
+					LastName:    owner.LastName,
+					AboutMe:     owner.AboutMe,
+					PathToPhoto: owner.PathToPhoto,
+					BirthDate:   entity.TimeToString(owner.BirthDate),
+				},
 				Title:       group.Title,
 				Description: group.Description,
 			})
@@ -103,6 +120,7 @@ func getGroup(w http.ResponseWriter, r *http.Request, groupService group.UseCase
 
 func groupHandlers(groupService group.UseCase, userService user.UseCase) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		print(r.Method)
 		switch r.Method {
 		case "GET":
 			getGroup(w, r, groupService, userService)
@@ -116,5 +134,5 @@ func groupHandlers(groupService group.UseCase, userService user.UseCase) http.Ha
 
 func MakeGroupHandlers(r *http.ServeMux, sessionService session.UseCase, groupService group.UseCase, userService user.UseCase) {
 	r.Handle("/api/group", middleware.Auth(sessionService, groupHandlers(groupService, userService)))
-	r.Handle("/api/groups", getGroups(groupService))
+	r.Handle("/api/groups", getGroups(groupService, userService))
 }
