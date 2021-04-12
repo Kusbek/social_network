@@ -7,6 +7,7 @@ import MainPage from '../views/MainPage.vue'
 import Profile from '../views/Profile.vue'
 import Group from '../views/group/Group.vue'
 import Groups from '../views/group/Groups.vue'
+import InviteForm from '../views/group/InviteForm.vue'
 import CreateGroupForm from '../views/group/CreateGroupForm.vue'
 import Test from '../views/Test.vue'
 
@@ -42,6 +43,13 @@ const routes = [
     path: '/group/:id',
     name: 'Group',
     component: Group,
+    props: true,
+    beforeEnter:requireAuth,
+  },
+  {
+    path: '/group/:id/invite',
+    name: 'InviteForm',
+    component: InviteForm,
     props: true,
     beforeEnter:requireAuth,
   },

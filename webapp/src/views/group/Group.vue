@@ -7,7 +7,16 @@
         <GroupInfo :group="group" />
         <PostList />
       </div>
-      <div>Group Members</div>
+      <div>
+        <div>
+          <router-link
+            class="btn"
+            :to="{ name: 'InviteForm', params: { id: id } }"
+            >Invite User</router-link
+          >
+        </div>
+        Group Members
+      </div>
     </div>
   </div>
 </template>
@@ -50,5 +59,9 @@ export default {
   display: grid;
   grid-template-columns: 1fr 3fr;
   column-gap: 80px;
+}
+
+.btn {
+  margin: 10px;
 }
 </style>
