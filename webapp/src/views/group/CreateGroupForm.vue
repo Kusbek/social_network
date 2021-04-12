@@ -8,7 +8,7 @@
       v-model="description"
     />
     <div v-if="error" class="error">{{ error }}</div>
-    <button v-if="!error">Create</button>
+    <button>Create</button>
   </form>
 </template>
 

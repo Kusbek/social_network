@@ -9,8 +9,15 @@
         <div v-if="user">
           <!-- <router-link :to="{ name: 'CreatePlaylist' }">Create Playlist</router-link>
           <router-link :to="{ name: 'UserPlaylists' }">My Playlists</router-link> -->
-          <router-link class="btn" :to="{ name: 'CreateGroupForm' }">New Group</router-link>
-          <span>Hi there, {{ user.username }}</span>
+          <router-link class="btn" :to="{ name: 'Groups' }"
+            >All Groups</router-link
+          >
+          <router-link class="btn" :to="{ name: 'CreateGroupForm' }"
+            >New Group</router-link
+          >
+          <router-link :to="{ name: 'Profile', params: { id: user.id } }">
+            <span>Hi there, {{ user.username }}</span>
+          </router-link>
           <button @click="handleClick">Logout</button>
         </div>
         <div v-else>
