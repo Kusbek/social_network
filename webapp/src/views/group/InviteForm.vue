@@ -5,7 +5,7 @@
       <button>Invite other users</button>
     </form>
     <form v-else @submit.prevent="handleSubmit">
-      <input type="text" placeholder="Username or email" v-model="nickmail" />
+      <input type="text" placeholder="Username or email" v-model="nickmail" required/>
       <div v-if="error" class="error">{{ error }}</div>
       <button>Invite</button>
     </form>
@@ -16,13 +16,14 @@
 import { ref } from "@vue/reactivity";
 import useGroupSubscription from "../../composables/groupsubscription";
 export default {
-  setup() {
+  props: ['id'],
+  setup(props) {
     const { error, invite } = useGroupSubscription();
     const nickmail = ref("");
     const successfullyInvited = ref(false);
 
     const handleSubmit = async () => {
-      await invite(nickmail.value);
+      await invite(nickmail.value, Number(props.id));
       if (!error.value) {
         successfullyInvited.value = true;
       }

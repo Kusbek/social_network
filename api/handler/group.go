@@ -134,5 +134,7 @@ func groupHandlers(groupService group.UseCase, userService user.UseCase) http.Ha
 
 func MakeGroupHandlers(r *http.ServeMux, sessionService session.UseCase, groupService group.UseCase, userService user.UseCase) {
 	r.Handle("/api/group", middleware.Auth(sessionService, groupHandlers(groupService, userService)))
+	r.Handle("/api/group/invite", middleware.Auth(sessionService, groupInvite(groupService, userService)))
 	r.Handle("/api/groups", getGroups(groupService, userService))
+
 }
