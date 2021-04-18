@@ -22,7 +22,6 @@ const useGroupSubscription = () => {
                 if (res.status == 404) {
                     throw Error("could not find such user")
                 } 
-
                 if (res.status == 400) {
                     throw Error("you can't invite owner of the group")
                 }
@@ -32,9 +31,28 @@ const useGroupSubscription = () => {
             error.value = e.message
         }
     }
+
+    const groupInviteList = ref([])
+    const getGroupInviteList = async() => {
+        error.value = null
+        try {
+            let res = await fetch(`/api/group/invites`)
+            if (!res.ok) {
+                throw Error("Failed to get group invites")
+            }
+            let data = await res.json()
+            groupInviteList.value = data.group_invites
+        } catch (e) {
+            console.log(e.message)
+            error.value = e.message
+        }    
+    }
+
     return {
         error,
-        invite
+        groupInviteList,
+        invite,
+        getGroupInviteList
     }
 }
 export default useGroupSubscription

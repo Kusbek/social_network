@@ -81,3 +81,31 @@ func (r *GroupRepository) GetList() ([]*entity.Group, error) {
 	}
 	return groups, nil
 }
+
+func (r *GroupRepository) GetInvites(userID int) ([]*entity.Group, error) {
+	rows, err := r.db.Query(`SELECT id, title, description FROM groups WHERE id in (SELECT group_id FROM group_list WHERE user_id = $1 AND group_requested=1)`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	groups := make([]*entity.Group, 0)
+	for rows.Next() {
+		group := new(entity.Group)
+		err = rows.Scan(
+			&group.ID,
+			&group.Title,
+			&group.Description,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		groups = append(groups, group)
+
+	}
+	if err != nil {
+		return nil, err
+	}
+	return groups, nil
+}

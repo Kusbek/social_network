@@ -20,6 +20,7 @@
         />
       </div>
       <SubsReqList v-if="self" />
+      <GroupInviteList v-if="self" />
       <SubsList :title="'Followers'" :users="followersList" />
       <SubsList :title="'Following'" :users="followingList" />
     </div>
@@ -33,9 +34,9 @@ import SubsList from "@/components/SubsList";
 import SubsReqList from "@/components/SubsReqList";
 import useSubscription from "@/composables/subscription.js";
 import useProfile from "@/composables/profile.js";
-
+import GroupInviteList from "../components/GroupInviteList";
 export default {
-  components: { FollowButton, Switch, SubsList, SubsReqList },
+  components: { FollowButton, Switch, SubsList, SubsReqList, GroupInviteList },
   props: ["self", "profile"],
   setup(props) {
     const { error, setPublicity } = useProfile();

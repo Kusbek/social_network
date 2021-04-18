@@ -5,6 +5,7 @@ import "git.01.alem.school/Kusbek/social-network/entity"
 type Reader interface {
 	Get(id entity.ID) (*entity.Group, error)
 	GetList() ([]*entity.Group, error)
+	GetInvites(userID int) ([]*entity.Group, error)
 }
 
 //Writer ...
@@ -24,4 +25,5 @@ type UseCase interface {
 	GetGroup(id entity.ID) (*entity.Group, error)
 	GetGroups() ([]*entity.Group, error)
 	CreateInvitedByGroupRequest(userID, groupID entity.ID) error
+	GetInvites(userID int) ([]*entity.Group, error)
 }
