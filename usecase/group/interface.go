@@ -12,6 +12,7 @@ type Reader interface {
 type Writer interface {
 	Create(group *entity.Group) (entity.ID, error)
 	CreateInvitedByGroupRequest(userID, groupID entity.ID) error
+	AcceptInvite(userID, groupID entity.ID) error
 }
 
 //Repository ...
@@ -26,4 +27,5 @@ type UseCase interface {
 	GetGroups() ([]*entity.Group, error)
 	CreateInvitedByGroupRequest(userID, groupID entity.ID) error
 	GetInvites(userID int) ([]*entity.Group, error)
+	AcceptInvite(userID, groupID entity.ID) error
 }

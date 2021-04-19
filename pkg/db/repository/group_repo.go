@@ -109,3 +109,11 @@ func (r *GroupRepository) GetInvites(userID int) ([]*entity.Group, error) {
 	}
 	return groups, nil
 }
+
+func (r *GroupRepository) AcceptInvite(userID, groupID entity.ID) error {
+	_, err := r.db.Exec(`UPDATE group_list SET group_requested=0 WHERE user_id=$1 AND group_id=$2`, userID, groupID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

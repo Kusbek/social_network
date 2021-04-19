@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 
 	"git.01.alem.school/Kusbek/social-network/entity"
 )
@@ -38,7 +37,6 @@ func (r *SubscriptionRepository) AcceptFollowRequest(userID, followerID int) err
 	if err != nil {
 		return err
 	}
-	fmt.Println(userID, followerID)
 	return nil
 }
 

@@ -21,11 +21,21 @@
 import useGroupSubscription from "../composables/groupsubscription";
 export default {
   setup(props) {
-    const { error, groupInviteList, getGroupInviteList } = useGroupSubscription();
+    const {
+      error,
+      groupInviteList,
+      getGroupInviteList,
+      acceptInvite,
+    } = useGroupSubscription();
     getGroupInviteList();
-    const handleAccept = () => {
-        console.log("ACPETING")
-    }
+    const handleAccept = async (groupId) => {
+      await acceptInvite(groupId);
+      if (!error.value) {
+        groupInviteList.value = groupInviteList.value.filter(
+          (group) => group.id != groupId
+        );
+      }
+    };
     return {
       error,
       groupInviteList,

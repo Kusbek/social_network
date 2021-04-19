@@ -35,8 +35,12 @@ func (s *Service) GetGroups() ([]*entity.Group, error) {
 	return s.repo.GetList()
 }
 
-func (s *Service) GetInvites(userID int) ([]*entity.Group, error) {
+func (s *Service) GetInvites(userID entity.ID) ([]*entity.Group, error) {
 	return s.repo.GetInvites(userID)
+}
+
+func (s *Service) AcceptInvite(userID, groupID entity.ID) error {
+	return s.repo.AcceptInvite(userID, groupID)
 }
 
 func (s *Service) CreateInvitedByGroupRequest(userID, groupID entity.ID) error {

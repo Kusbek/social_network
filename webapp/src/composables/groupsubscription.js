@@ -48,11 +48,32 @@ const useGroupSubscription = () => {
         }    
     }
 
+    const acceptInvite = async(groupId) => {
+        error.value = null
+        let body = {
+            group_id: groupId,
+        }
+        try {
+            let res = await fetch(`/api/group/invite`, {
+                method: "PUT",
+                body: JSON.stringify(body)
+            })
+            if (!res.ok) {
+                throw Error("Failed to accept group invite")
+            }
+
+        } catch (e) {
+            console.log(e.message)
+            error.value = e.message
+        }   
+    }
+
     return {
         error,
         groupInviteList,
         invite,
-        getGroupInviteList
+        getGroupInviteList,
+        acceptInvite,
     }
 }
 export default useGroupSubscription
