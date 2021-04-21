@@ -15,7 +15,7 @@
             >Invite User</router-link
           >
         </div>
-        Group Members
+         <SubsList :title="'Group Members'" :users="groupMemberList" />
       </div>
     </div>
   </div>
@@ -27,7 +27,7 @@ import GroupInfo from "../../components/GroupInfo";
 import PostList from "../../components/PostList";
 import SubsList from "../../components/SubsList";
 import useGroup from "../../composables/group.js";
-
+import useGroupSubscription from '../../composables/groupsubscription';
 export default {
   props: ["id"],
   components: { GroupInfo, PostList, SubsList },
@@ -46,10 +46,14 @@ export default {
     // });
 
     const { error, group, getGroup } = useGroup();
+    const { error: subsError, getGroupMemberList, groupMemberList} = useGroupSubscription()
     getGroup(props.id);
+    getGroupMemberList(props.id)
     return {
+      subsError,
       error,
       group,
+      groupMemberList,
     };
   },
 };

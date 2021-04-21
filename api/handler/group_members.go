@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"git.01.alem.school/Kusbek/social-network/api/middleware"
 	"git.01.alem.school/Kusbek/social-network/api/presenter"
@@ -129,6 +130,39 @@ func getGroupInvites(groupService group.UseCase) http.HandlerFunc {
 
 		successResponse(w, http.StatusOK, map[string]interface{}{
 			"group_invites": groupInvitesJSON,
+		})
+	})
+}
+
+func getGroupMembers(groupService group.UseCase, userService user.UseCase) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			errorResponse(w, http.StatusMethodNotAllowed, fmt.Errorf("wrong method"))
+			return
+		}
+		groupID, err := strconv.Atoi(r.URL.Query().Get("group_id"))
+		if err != nil {
+			errorResponse(w, http.StatusBadRequest, fmt.Errorf("group_id is a required parameter"))
+			return
+		}
+
+		members, err := groupService.GetGroupMembers(groupID)
+		if err != nil {
+			errorResponse(w, http.StatusInternalServerError, err)
+			return
+		}
+		membersJSON := make([]*presenter.User, 0, len(members))
+		for _, m := range members {
+			membersJSON = append(membersJSON, &presenter.User{
+				ID:          m.ID,
+				FirstName:   m.FirstName,
+				LastName:    m.LastName,
+				PathToPhoto: m.PathToPhoto,
+			})
+		}
+
+		successResponse(w, http.StatusOK, map[string]interface{}{
+			"group_members": membersJSON,
 		})
 	})
 }

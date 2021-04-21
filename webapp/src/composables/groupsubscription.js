@@ -68,12 +68,30 @@ const useGroupSubscription = () => {
         }   
     }
 
+    const groupMemberList = ref([])
+    const getGroupMemberList = async(groupId) => {
+        error.value = null
+        try {
+            let res = await fetch(`/api/group/members?group_id=${groupId}`)
+            if (!res.ok) {
+                throw Error("Failed to get group members")
+            }
+            let data = await res.json()
+            groupMemberList.value = data.group_members
+        } catch (e) {
+            console.log(e.message)
+            error.value = e.message
+        }    
+    }
+
     return {
         error,
         groupInviteList,
+        groupMemberList,
         invite,
         getGroupInviteList,
         acceptInvite,
+        getGroupMemberList
     }
 }
 export default useGroupSubscription

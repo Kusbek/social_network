@@ -117,3 +117,28 @@ func (r *GroupRepository) AcceptInvite(userID, groupID entity.ID) error {
 	}
 	return nil
 }
+
+func (r *GroupRepository) GetGroupMembers(groupID entity.ID) ([]*entity.User, error) {
+	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT user_id FROM group_list WHERE group_id=$1 AND (group_requested=0 OR user_requested=0))`, groupID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	groupMembers := make([]*entity.User, 0)
+	for rows.Next() {
+		groupMember := &entity.User{}
+		err = rows.Scan(
+			&groupMember.ID,
+			&groupMember.FirstName,
+			&groupMember.LastName,
+			&groupMember.PathToPhoto,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		groupMembers = append(groupMembers, groupMember)
+	}
+
+	return groupMembers, nil
+}

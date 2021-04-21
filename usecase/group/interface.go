@@ -6,6 +6,7 @@ type Reader interface {
 	Get(id entity.ID) (*entity.Group, error)
 	GetList() ([]*entity.Group, error)
 	GetInvites(userID int) ([]*entity.Group, error)
+	GetGroupMembers(groupID entity.ID) ([]*entity.User, error)
 }
 
 //Writer ...
@@ -28,4 +29,5 @@ type UseCase interface {
 	CreateInvitedByGroupRequest(userID, groupID entity.ID) error
 	GetInvites(userID int) ([]*entity.Group, error)
 	AcceptInvite(userID, groupID entity.ID) error
+	GetGroupMembers(groupID entity.ID) ([]*entity.User, error)
 }
