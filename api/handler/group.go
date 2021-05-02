@@ -120,7 +120,6 @@ func getGroup(w http.ResponseWriter, r *http.Request, groupService group.UseCase
 
 func groupHandlers(groupService group.UseCase, userService user.UseCase) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		print(r.Method)
 		switch r.Method {
 		case "GET":
 			getGroup(w, r, groupService, userService)
@@ -135,7 +134,14 @@ func groupHandlers(groupService group.UseCase, userService user.UseCase) http.Ha
 func MakeGroupHandlers(r *http.ServeMux, sessionService session.UseCase, groupService group.UseCase, userService user.UseCase) {
 	r.Handle("/api/group", middleware.Auth(sessionService, groupHandlers(groupService, userService)))
 	r.Handle("/api/group/members", getGroupMembers(groupService, userService))
-	r.Handle("/api/group/invite", middleware.Auth(sessionService, groupInviteHandlers(groupService, userService)))
+	r.Handle("/api/group/invite", middleware.Auth(
+		sessionService, middleware.IsGroupMember(
+			groupService, inviteUser(groupService, userService),
+		),
+	))
+	r.Handle("/api/group/invite/accept", middleware.Auth(sessionService, acceptInvite(groupService)))
+	r.Handle("/api/group/invite/join", middleware.Auth(sessionService, requestToJoin(groupService)))
 	r.Handle("/api/group/invites", middleware.Auth(sessionService, getGroupInvites(groupService)))
+	r.Handle("/api/group/ismember", isGroupMember(groupService))
 	r.Handle("/api/groups", getGroups(groupService, userService))
 }

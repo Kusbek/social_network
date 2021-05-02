@@ -35,10 +35,12 @@ import SubsReqList from "@/components/SubsReqList";
 import useSubscription from "@/composables/subscription.js";
 import useProfile from "@/composables/profile.js";
 import GroupInviteList from "../components/GroupInviteList";
+
 export default {
   components: { FollowButton, Switch, SubsList, SubsReqList, GroupInviteList },
-  props: ["self", "profile"],
+  props: ["self", "id"],
   setup(props) {
+    
     const { error, setPublicity } = useProfile();
     const {
       getFollowers,
@@ -46,18 +48,21 @@ export default {
       getFollowing,
       followingList,
     } = useSubscription();
-    getFollowers(props.profile.id);
-    getFollowing(props.profile.id);
+    const { profile, error: profileError, load } = useProfile();
+    load(props.id);
+    getFollowers(props.id);
+    getFollowing(props.id);
 
     const handleToggle = async () => {
-      await setPublicity(!props.profile.is_public);
-      if (!error.value) {
-        props.profile.is_public = !props.profile.is_public;
+      await setPublicity(!profile.value.is_public);
+      if (!profileError.value) {
+        profile.value.is_public = !profile.value.is_public;
       }
     };
 
     return {
       error,
+      profile,
       handleToggle,
       followersList,
       followingList,

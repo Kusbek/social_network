@@ -37,7 +37,6 @@ export default {
         followRequestList.value = followRequestList.value.filter(
           (user) => user.id != id
         );
-        console.log(followRequestList.value);
       }
     };
     return {

@@ -7,12 +7,15 @@ type Reader interface {
 	GetList() ([]*entity.Group, error)
 	GetInvites(userID int) ([]*entity.Group, error)
 	GetGroupMembers(groupID entity.ID) ([]*entity.User, error)
+	IsGroupMember(userID, groupID entity.ID) (bool, error)
+	RequestIsPending(userID, groupID entity.ID) (bool, error)
 }
 
 //Writer ...
 type Writer interface {
 	Create(group *entity.Group) (entity.ID, error)
 	CreateInvitedByGroupRequest(userID, groupID entity.ID) error
+	CreateJoinGroupRequest(userID, groupID entity.ID) error
 	AcceptInvite(userID, groupID entity.ID) error
 }
 
@@ -27,7 +30,10 @@ type UseCase interface {
 	GetGroup(id entity.ID) (*entity.Group, error)
 	GetGroups() ([]*entity.Group, error)
 	CreateInvitedByGroupRequest(userID, groupID entity.ID) error
+	CreateJoinGroupRequest(userID, groupID entity.ID) error
 	GetInvites(userID int) ([]*entity.Group, error)
 	AcceptInvite(userID, groupID entity.ID) error
 	GetGroupMembers(groupID entity.ID) ([]*entity.User, error)
+	IsGroupMember(userID, groupID entity.ID) (bool, error)
+	RequestIsPending(userID, groupID entity.ID) (bool, error)
 }

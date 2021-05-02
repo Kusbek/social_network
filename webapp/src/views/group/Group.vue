@@ -8,14 +8,20 @@
         <PostList />
       </div>
       <div>
-        <div>
+        <div v-if="isGroupMember">
           <router-link
             class="btn"
             :to="{ name: 'InviteForm', params: { id: id } }"
             >Invite User</router-link
           >
         </div>
-         <SubsList :title="'Group Members'" :users="groupMemberList" />
+        <div v-else-if="reqIsPending">
+          <button disabled>Request is sent</button>
+        </div>
+        <div v-else>
+          <button @click="handleJoinRequestClick">I want to join</button>
+        </div>
+        <SubsList :title="'Group Members'" :users="groupMemberList" />
       </div>
     </div>
   </div>
@@ -27,33 +33,45 @@ import GroupInfo from "../../components/GroupInfo";
 import PostList from "../../components/PostList";
 import SubsList from "../../components/SubsList";
 import useGroup from "../../composables/group.js";
-import useGroupSubscription from '../../composables/groupsubscription';
+import useGroupSubscription from "../../composables/groupsubscription";
+import User from "../../composables/user";
 export default {
   props: ["id"],
   components: { GroupInfo, PostList, SubsList },
   setup(props) {
-    // const error = ref(null);
-    // const group = ref({
-    //   id: props.id,
-    //   owner: {
-    //     id: 1,
-    //     first_name: "Bekarys",
-    //     last_name: "Kuspan",
-    //     path_to_photo: "/img/avatars/2021-03-15 20.32.55.jpg",
-    //   },
-    //   title: "test group title",
-    //   description: "test group descriptions",
-    // });
-
     const { error, group, getGroup } = useGroup();
-    const { error: subsError, getGroupMemberList, groupMemberList} = useGroupSubscription()
+    const { user, getUser } = User();
+    const {
+      error: subsError,
+      getGroupMemberList,
+      groupMemberList,
+      isGroupMember,
+      reqIsPending,
+      checkIfGroupMember,
+      requestToJoin
+    } = useGroupSubscription();
     getGroup(props.id);
-    getGroupMemberList(props.id)
+    getGroupMemberList(props.id);
+    getUser().then(() => {
+      checkIfGroupMember(user.value.id, props.id);
+    });
+
+ 
+    const handleJoinRequestClick = async() => {
+      await requestToJoin(props.id)
+      if (!subsError.value){
+        reqIsPending.value = true
+      }
+    };
+
     return {
       subsError,
       error,
       group,
       groupMemberList,
+      isGroupMember,
+      reqIsPending,
+      handleJoinRequestClick,
     };
   },
 };

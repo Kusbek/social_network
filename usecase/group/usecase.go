@@ -1,6 +1,8 @@
 package group
 
-import "git.01.alem.school/Kusbek/social-network/entity"
+import (
+	"git.01.alem.school/Kusbek/social-network/entity"
+)
 
 type Service struct {
 	repo Repository
@@ -23,6 +25,15 @@ func (s *Service) CreateGroup(ownerID entity.ID, title, description string) (*en
 		return nil, err
 	}
 
+	err = s.repo.CreateInvitedByGroupRequest(g.OwnerID, id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.repo.AcceptInvite(g.OwnerID, id)
+	if err != nil {
+		return nil, err
+	}
 	g.ID = id
 	return g, nil
 }
@@ -47,6 +58,18 @@ func (s *Service) CreateInvitedByGroupRequest(userID, groupID entity.ID) error {
 	return s.repo.CreateInvitedByGroupRequest(userID, groupID)
 }
 
+func (s *Service) CreateJoinGroupRequest(userID, groupID entity.ID) error {
+	return s.repo.CreateJoinGroupRequest(userID, groupID)
+}
+
 func (s *Service) GetGroupMembers(groupID entity.ID) ([]*entity.User, error) {
 	return s.repo.GetGroupMembers(groupID)
+}
+
+func (s *Service) IsGroupMember(userID, groupID entity.ID) (bool, error) {
+	return s.repo.IsGroupMember(userID, groupID)
+}
+
+func (s *Service) RequestIsPending(userID, groupID entity.ID) (bool, error) {
+	return s.repo.RequestIsPending(userID, groupID)
 }

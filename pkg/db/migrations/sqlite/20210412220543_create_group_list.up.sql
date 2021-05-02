@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS group_list (
+	group_id INTEGER,
 	user_id INTEGER,
-  	group_id INTEGER,
 	group_requested BOOLEAN,
 	user_requested BOOLEAN,
     FOREIGN KEY (user_id) REFERENCES users (id),

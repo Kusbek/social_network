@@ -11,7 +11,7 @@ const useGroupSubscription = () => {
             group_id: groupId
         }
         try {
-            let res = await fetch('/api/group/invite', {
+            let res = await fetch(`/api/group/invite?group_id=${groupId}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -22,9 +22,13 @@ const useGroupSubscription = () => {
                 if (res.status == 404) {
                     throw Error("could not find such user")
                 } 
-                if (res.status == 400) {
+                if (res.status == 418) {
                     throw Error("you can't invite owner of the group")
                 }
+                if (res.status == 403) {
+                    throw Error("you are not allowed to invite")
+                }
+                throw Error("Something went wrong")
             }
         } catch (e) {
             console.log(e.message)
@@ -54,7 +58,7 @@ const useGroupSubscription = () => {
             group_id: groupId,
         }
         try {
-            let res = await fetch(`/api/group/invite`, {
+            let res = await fetch(`/api/group/invite/accept`, {
                 method: "PUT",
                 body: JSON.stringify(body)
             })
@@ -84,10 +88,54 @@ const useGroupSubscription = () => {
         }    
     }
 
+    const isGroupMember = ref(false)
+    const reqIsPending = ref(false)
+    const checkIfGroupMember = async(userId, groupId) => {
+        error.value = null
+        
+        try {
+            let res = await fetch(`/api/group/ismember?group_id=${groupId}&user_id=${userId}`)
+            if (!res.ok) {
+                throw Error("Failed to check if group member")
+            }
+            let data = await res.json()
+            isGroupMember.value = data.is_group_member
+            reqIsPending.value = data.request_is_pending
+        } catch (e) {
+            console.log(e.message)
+            error.value = e.message
+        }  
+    }
+
+
+    const requestToJoin = async(groupId) => {
+        error.value = null
+        let body = {
+            group_id: Number(groupId),
+        }
+        try {
+            let res = await fetch(`/api/group/invite/join`, {
+                method: "POST",
+                body: JSON.stringify(body)
+            })
+            if (!res.ok) {
+                throw Error("Failed to send a join request")
+            }
+
+        } catch (e) {
+            console.log(e.message)
+            error.value = e.message
+        }  
+    }
+
     return {
         error,
         groupInviteList,
         groupMemberList,
+        isGroupMember,
+        reqIsPending,
+        requestToJoin,
+        checkIfGroupMember,
         invite,
         getGroupInviteList,
         acceptInvite,

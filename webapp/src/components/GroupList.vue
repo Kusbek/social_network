@@ -17,7 +17,7 @@
 export default {
   props: ["groups"],
   setup(props) {
-    console.log(props.groups);
+    
   },
 };
 </script>

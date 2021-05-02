@@ -10,7 +10,7 @@
         <FollowButton :id="id" />
       </div>
       <div v-else class="profile-details">
-        <ProfileInfo :self="parseInt(id) === user.id" :profile="profile" />
+        <ProfileInfo :self="parseInt(id) === user.id" :id="id" />
         <div class="post-box">
           <PostList />
         </div>

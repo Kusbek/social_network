@@ -37,6 +37,14 @@ func (r *GroupRepository) CreateInvitedByGroupRequest(userID, groupID entity.ID)
 	return nil
 }
 
+func (r *GroupRepository) CreateJoinGroupRequest(userID, groupID entity.ID) error {
+	_, err := r.db.Exec(`INSERT INTO group_list (user_id, group_id, user_requested) VALUES($1,$2,1)`, userID, groupID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *GroupRepository) Get(id entity.ID) (*entity.Group, error) {
 	group := new(entity.Group)
 	err := r.db.QueryRow(`SELECT id, owner_id, title, description FROM groups WHERE id=$1`, id).Scan(
@@ -111,7 +119,7 @@ func (r *GroupRepository) GetInvites(userID int) ([]*entity.Group, error) {
 }
 
 func (r *GroupRepository) AcceptInvite(userID, groupID entity.ID) error {
-	_, err := r.db.Exec(`UPDATE group_list SET group_requested=0 WHERE user_id=$1 AND group_id=$2`, userID, groupID)
+	_, err := r.db.Exec(`UPDATE group_list SET group_requested=0, user_requested=0 WHERE user_id=$1 AND group_id=$2`, userID, groupID)
 	if err != nil {
 		return err
 	}
@@ -119,7 +127,7 @@ func (r *GroupRepository) AcceptInvite(userID, groupID entity.ID) error {
 }
 
 func (r *GroupRepository) GetGroupMembers(groupID entity.ID) ([]*entity.User, error) {
-	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT user_id FROM group_list WHERE group_id=$1 AND (group_requested=0 OR user_requested=0))`, groupID)
+	rows, err := r.db.Query(`SELECT id, first_name, last_name, path_to_photo from users WHERE id IN (SELECT user_id FROM group_list WHERE group_id=$1 AND group_requested=0 AND user_requested=0)`, groupID)
 	if err != nil {
 		return nil, err
 	}
@@ -141,4 +149,22 @@ func (r *GroupRepository) GetGroupMembers(groupID entity.ID) ([]*entity.User, er
 	}
 
 	return groupMembers, nil
+}
+
+func (r *GroupRepository) IsGroupMember(userID, groupID entity.ID) (bool, error) {
+	var isMember bool
+	err := r.db.QueryRow(`SELECT EXISTS(SELECT 1 FROM group_list WHERE user_id=$1 AND group_id=$2 AND group_requested=0 AND user_requested=0)`, userID, groupID).Scan(&isMember)
+	if err != nil {
+		return false, err
+	}
+	return isMember, nil
+}
+
+func (r *GroupRepository) RequestIsPending(userID, groupID entity.ID) (bool, error) {
+	var ReqIsPending bool
+	err := r.db.QueryRow(`SELECT EXISTS(SELECT 1 FROM group_list WHERE user_id=$1 AND group_id=$2 AND (group_requested=1 OR user_requested=1))`, userID, groupID).Scan(&ReqIsPending)
+	if err != nil {
+		return false, err
+	}
+	return ReqIsPending, nil
 }

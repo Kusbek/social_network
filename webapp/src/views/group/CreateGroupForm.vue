@@ -24,7 +24,6 @@ export default {
     const description = ref("");
     const handleSubmit = async () => {
       let newGroup = await createGroup(title.value, description.value);
-      console.log(newGroup);
       if (!error.value) {
         router.push({ name: "Group", params: { id: newGroup.id } });
       }
