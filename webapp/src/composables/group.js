@@ -17,7 +17,6 @@ const useGroup = () => {
                 throw Error("Could not fetch group")
             }
             let data = await res.json()
-            console.log(data)
             group.value = {
                 ...data
             }
