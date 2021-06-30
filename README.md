@@ -26,3 +26,5 @@ go run ./pkg/db/sqlite/cmd/main.go
 ```bash
 go run server.go
 ```
+
+enter username and pass: kusbek and 123456
